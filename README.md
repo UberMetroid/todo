@@ -1,122 +1,117 @@
-# DumbDo
+# RustDo
 
-A stupidly simple todo list application that just works. No complex database, no unnecessary features - just todos.
+A high-performance, single-purpose todo list application written in **100% Rust**. Powered by **Axum** on the backend and **Yew (WebAssembly)** on the frontend.
 
-![image](https://github.com/user-attachments/assets/a7857b13-db10-430f-af20-aedbf0d26023)
+No heavy databases, no bloated JavaScript runtime, no tracking—just todos, compiled to native code.
 
+---
 
 ## Features
 
-- ✨ Clean, minimal interface
-- 🌓 Dark/Light mode with system preference detection
-- 💾 File-based storage - todos persist between sessions
-- 📱 Fully responsive design
-- 🚀 Fast and lightweight
-- 🔒 PIN protection (4-10 digits if enabled)
-- 🌐 PWA Support
+- ✨ **Clean, Minimal Interface**: A premium responsive layout optimized for mobile and desktop.
+- 🌓 **Automatic Dark/Light Mode**: Synced to system preference with localStorage override.
+- 💾 **Atomic File-Based Storage**: Todos are persisted safely using atomic file renames to prevent corruption.
+- 🚀 **Blazing Fast WASM**: Client UI is powered by Rust compiled to WebAssembly (via Yew & Trunk).
+- 🔒 **PIN Lockout Protection**: Secure client-IP rate limiting and timing-safe comparisons.
+- 🌐 **PWA & Offline Support**: Fully installable as a web app with service-worker caching.
+
+---
 
 ## Environment Variables
 
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
-| PORT | The port number the server will listen on | 3000 | No |
-| DUMBDO_PIN | PIN protection for accessing todos (4-10 digits) | - | No |
-| SINGLE_LIST | Show a single List of ToDos (without the selector) | false | No |
+| `PORT` | The port number the Axum server will listen on | `3000` | No |
+| `RUSTDO_PIN` | Secure PIN code for accessing todos (4-10 digits) | - | No |
+| `RUSTDO_SITE_TITLE` | Override the UI and HTML title | `RustDo` | No |
+| `SINGLE_LIST` | Show a single list of todos (without selector controls) | `false` | No |
+| `ALLOWED_ORIGINS` | Restrict CORS origins (e.g. `https://sub.domain.com`) | `*` | No |
+
+---
 
 ## Quick Start
 
-### Running Locally
+### 1. Build and Run Locally
 
-1. Clone the repository
+Ensure you have Rust and **Trunk** installed:
 ```bash
-git clone https://github.com/dumbwareio/dumbdo.git
-cd dumbdo
+# Verify wasm target is installed
+rustup target add wasm32-unknown-unknown
+
+# Install Trunk for WASM compiling
+cargo install trunk
 ```
 
-2. Install dependencies
+1. **Clone the repository** and navigate to it:
+   ```bash
+   git clone https://github.com/UberMetroid/RustDo.git
+   cd RustDo
+   ```
+
+2. **Compile the Yew frontend**:
+   ```bash
+   cd frontend
+   trunk build --release
+   cd ..
+   ```
+
+3. **Start the Axum server**:
+   ```bash
+   cargo run --bin backend --release
+   ```
+
+4. Open `http://localhost:3000` in your browser.
+
+---
+
+### 2. Using Docker Compose
+
+Build and spin up the entire application inside a lightweight Alpine container:
+
 ```bash
-npm install
+docker-compose up --build -d
 ```
 
-3. Start the server
-```bash
-npm start
-```
+Your `docker-compose.yml` service configuration:
 
-4. Open http://localhost:3000 in your browser
-
-### Using Docker
-
-1. Pull from Docker Hub (recommended)
-```bash
-docker pull dumbwareio/dumbdo:latest
-docker run -p 3000:3000 -v $(pwd)/data:/app/data dumbwareio/dumbdo:latest
-```
-
-2. Or build locally
-```bash
-docker build -t dumbwareio/dumbdo .
-docker run -p 3000:3000 -v $(pwd)/data:/app/data dumbwareio/dumbdo
-```
-
-3. Docker Compose
 ```yaml
 services:
-  dumbdo:
-    image: dumbwareio/dumbdo:latest
-    container_name: dumbdo
+  rustdo:
+    build: .
+    image: ubermetroid/rustdo:latest
+    container_name: rustdo
     restart: unless-stopped
     ports:
-      - ${DUMBDO_PORT:-3000}:3000
+      - ${RUSTDO_PORT:-3000}:3000
     volumes:
-      - ${DUMBDO_DATA_PATH:-./data}:/app/data
+      - ${RUSTDO_DATA_PATH:-./data}:/app/data
     environment:
-      - DUMBDO_PIN=${DUMBDO_PIN-}
-      - DUMBDO_SITE_TITLE=DumbDo
-      # (Optional) Restrict origins - ex: https://subdomain.domain.tld,https://auth.proxy.tld,http://internalip:port' (default is '*')
-      # - ALLOWED_ORIGINS=http://localhost:3000
-      # - NODE_ENV=development # default production (development allows all origins)
-    #healthcheck:
-    #  test: wget --spider -q  http://127.0.0.1:3000
-    #  start_period: 20s
-    #  interval: 20s
-    #  timeout: 5s
-    #  retries: 3
+      - RUSTDO_PIN=${RUSTDO_PIN-}
+      - RUSTDO_SITE_TITLE=RustDo
+      - SINGLE_LIST=${SINGLE_LIST:-false}
 ```
-## Storage
 
-Todos are stored in a JSON file at `app/data/todos.json`. The file is automatically created when you first run the application. 
+---
 
-To backup your todos, simply copy the `data` directory. To restore, place your backup `todos.json` in the `data` directory.
-
-## Development
-
-The application follows the "Dumb" design system principles:
-
-- No complex storage
-- Single purpose, done well
-- "It just works"
-
-### Project Structure
+## Project Structure
 
 ```
-dumbdo/
-├── app.js          # Frontend JavaScript
-├── index.html      # Main HTML file
-├── server.js       # Node.js server
-├── styles.css      # CSS styles
-├── data/          # Todo storage directory
+RustDo/
+├── Cargo.toml          # Workspace manifest
+├── Dockerfile          # Multi-stage optimized Rust builder
+├── docker-compose.yml  # Docker Compose config
+├── data/               # Persistent todo storage (JSON format)
 │   └── todos.json
-├── Dockerfile     # Docker configuration
-└── package.json   # Dependencies and scripts
+├── shared/             # Shared Rust libraries (serde structures)
+│   ├── Cargo.toml
+│   └── src/lib.rs
+├── backend/            # Axum HTTP server & APIs
+│   ├── Cargo.toml
+│   └── src/main.rs
+└── frontend/           # Yew frontend (SPA compiled to WASM)
+    ├── Cargo.toml
+    ├── index.html      # Trunk HTML entry point
+    ├── styles.css      # App stylesheet
+    ├── service-worker.js
+    └── src/main.rs     # Yew components
 ```
-
-## Support the Project
-
-<a href="https://www.buymeacoffee.com/dumbware" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60">
-</a>
-
-## Contributing
-
-This is meant to be a simple application. If you're writing complex code to solve a simple problem, you're probably doing it wrong. Keep it dumb, keep it simple. 

@@ -52,8 +52,8 @@ async fn main() {
         .parse::<u16>()
         .unwrap_or(3000);
 
-    let pin = std::env::var("DUMBDO_PIN").ok().filter(|p| !p.trim().is_empty());
-    let site_title = std::env::var("DUMBDO_SITE_TITLE").unwrap_or_else(|_| "DumbDo".to_string());
+    let pin = std::env::var("RUSTDO_PIN").ok().filter(|p| !p.trim().is_empty());
+    let site_title = std::env::var("RUSTDO_SITE_TITLE").unwrap_or_else(|_| "RustDo".to_string());
     let single_list = std::env::var("SINGLE_LIST")
         .map(|val| val == "true")
         .unwrap_or(false);
@@ -152,7 +152,7 @@ async fn main() {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    println!("DumbDo/RustDo server running at http://localhost:{}", port);
+    println!("RustDo server running at http://localhost:{}", port);
     println!(
         "PIN protection: {}",
         if app_state.pin.is_some() {
@@ -293,7 +293,7 @@ fn is_authenticated(state: &AppState, cookie_jar: &CookieJar, headers: &HeaderMa
     };
 
     let provided_pin = cookie_jar
-        .get("DUMBDO_PIN")
+        .get("RUSTDO_PIN")
         .map(|c| c.value())
         .or_else(|| headers.get("x-pin").and_then(|h| h.to_str().ok()));
 
@@ -440,7 +440,7 @@ async fn verify_pin(
     if valid {
         attempts.remove(&client_ip);
 
-        let cookie = Cookie::build(("DUMBDO_PIN", payload.pin))
+        let cookie = Cookie::build(("RUSTDO_PIN", payload.pin))
             .http_only(true)
             .secure(state.is_production)
             .same_site(cookie::SameSite::Strict)

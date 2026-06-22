@@ -804,7 +804,7 @@ fn app() -> Html {
 
         move || {
             let config = site_config.as_ref().cloned().unwrap_or(SiteConfig {
-                site_title: "DumbDo".to_string(),
+                site_title: "RustDo".to_string(),
                 single_list: false,
             });
 
@@ -1015,7 +1015,7 @@ fn app() -> Html {
             html! {
                 <div class="app login-page">
                     <div class="login-container">
-                        <h1>{"DumbDo"}</h1>
+                        <h1>{"RustDo"}</h1>
                         <div class="login-box">
                             <h2>{"Enter PIN"}</h2>
                             <p id="pin-description" class="pin-description">
