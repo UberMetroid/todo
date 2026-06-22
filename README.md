@@ -35,53 +35,53 @@ To build and run RustDo locally from source, the following dependencies are requ
 ### Environment Variables
 
 | Variable | Description | Default | Required |
-|:---|:---|:---|:---|
-| `PORT` | The port number the Axum backend HTTP server will bind to | `3000` | No |
+| :--- | :--- | :--- | :--- |
+| `PORT` | The port number the Axum backend HTTP server will bind to | `4403` | No |
 | `RUSTDO_PIN` | Lock todo access behind a secure digital PIN (4–10 digits) | *None (open)* | No |
 | `RUSTDO_SITE_TITLE` | Override the browser title, metadata headers, and PWA name | `RustDo` | No |
 | `SINGLE_LIST` | Force UI to hide list switcher and display only "List 1" | `false` | No |
 | `ALLOWED_ORIGINS` | Restrict CORS allowed origins (comma-separated list) | `*` | No |
 | `NODE_ENV` | Environment context. Disables CORS check if set to `development` | `production` | No |
-
+ 
 ---
-
+ 
 ## Quick Start
-
+ 
 Get RustDo up and running locally from source in under 2 minutes:
-
+ 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/UberMetroid/RustDo.git
 cd RustDo
-
+ 
 # 2. Add the WebAssembly compilation target
 rustup target add wasm32-unknown-unknown
-
+ 
 # 3. Install Trunk for compiling frontend WASM assets
 cargo install --locked trunk
-
+ 
 # 4. Compile frontend distribution static assets
 cd frontend && trunk build --release && cd ..
-
+ 
 # 5. Start the Axum backend server
-PORT=3000 RUSTDO_PIN=1234 cargo run --bin backend --release
+PORT=4403 RUSTDO_PIN=1234 cargo run --bin backend --release
 ```
-
-Open your browser and navigate to `http://localhost:3000` to access the application.
-
+ 
+Open your browser and navigate to `http://localhost:4403` to access the application.
+ 
 ---
-
+ 
 ## Docker & Docker Compose Configurations
-
+ 
 ### Docker Compose (Recommended)
-
+ 
 Run the entire application in detached mode with persistent volume storage out-of-the-box.
-
+ 
 Create a `docker-compose.yml` file:
-
+ 
 ```yaml
 version: '3.8'
-
+ 
 services:
   rustdo:
     build: .
@@ -89,34 +89,34 @@ services:
     container_name: rustdo
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "4403:4403"
     volumes:
       - ./data:/app/data
     environment:
-      - PORT=3000
+      - PORT=4403
       - RUSTDO_PIN=1234
       - RUSTDO_SITE_TITLE=My Todo App
       - SINGLE_LIST=false
       - ALLOWED_ORIGINS=*
 ```
-
+ 
 Start the container:
 ```bash
 docker-compose up --build -d
 ```
-
+ 
 ### Docker CLI
-
+ 
 Build and execute the multi-stage optimized runtime container directly using Docker:
-
+ 
 ```bash
 # Build the optimized Alpine-based release image
 docker build -t rustdo:latest .
-
+ 
 # Run the container with persistent folder mapping
 docker run -d \
   --name rustdo \
-  -p 3000:3000 \
+  -p 4403:4403 \
   -v $(pwd)/data:/app/data \
   -e RUSTDO_PIN=1234 \
   -e RUSTDO_SITE_TITLE="Team Board" \
