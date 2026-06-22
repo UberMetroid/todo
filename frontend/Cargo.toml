@@ -1,0 +1,30 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+shared = { path = "../shared" }
+yew = { version = "0.21.0", features = ["csr"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "HtmlInputElement",
+    "HtmlSelectElement",
+    "HtmlFormElement",
+    "MediaQueryList",
+    "Window",
+    "Document",
+    "Storage",
+    "Element",
+    "DomRect",
+    "DragEvent",
+    "MouseEvent",
+    "KeyboardEvent"
+] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+gloo-net = "0.5"
+gloo-timers = "0.3"
+gloo-storage = "0.3"

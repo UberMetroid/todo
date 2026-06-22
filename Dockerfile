@@ -1,40 +1,53 @@
-# Stage 1: Build the application
-FROM node:20-alpine AS builder
-
+# Stage 1: Build the frontend WASM application
+FROM rust:1.96-alpine AS frontend-builder
+RUN apk add --no-cache musl-dev wget tar
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Install wasm32 target
+RUN rustup target add wasm32-unknown-unknown
 
-# Install dependencies
-RUN npm install && \
-    npm cache clean --force
+# Install Trunk (precompiled binary to save build time)
+RUN wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-musl.tar.gz | tar -xzf- -C /usr/local/bin
 
-# Copy application files
-COPY . .
+# Copy shared & frontend crates
+COPY shared /app/shared
+COPY frontend /app/frontend
 
-# Stage 2: Create the runtime image
-FROM node:20-alpine
+# Build frontend
+WORKDIR /app/frontend
+RUN trunk build --release
 
+# Stage 2: Build the backend server
+FROM rust:1.96-alpine AS backend-builder
+RUN apk add --no-cache musl-dev
 WORKDIR /app
 
-# Copy only the necessary files from the builder stage
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/server.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/scripts ./scripts
+# Copy cargo files & all crates
+COPY Cargo.toml /app/Cargo.toml
+COPY shared /app/shared
+COPY backend /app/backend
 
-# Create data directory (if it doesn't exist)
-RUN mkdir -p data
+# Build backend
+WORKDIR /app/backend
+RUN cargo build --release --bin backend
 
-# Expose port (internal port)
+# Stage 3: Runtime image
+FROM alpine:3.18
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apk add --no-cache wget libc6-compat
+
+# Copy binaries and assets
+COPY --from=backend-builder /app/target/release/backend /app/backend
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+
+# Expose server port (internal port)
 EXPOSE 3000
 
 # Healthcheck
-RUN apk add --no-cache wget
 HEALTHCHECK --interval=20s --timeout=5s --start-period=20s --retries=3 \
-    CMD wget --spider -q http://127.0.0.1:3000 || exit 1
+    CMD wget --spider -q http://127.0.0.1:3000/api/config || exit 1
 
-# Start the application
-CMD ["npm", "start"]
+# Run the server
+CMD ["/app/backend"]

@@ -163,3 +163,7 @@ Boilerplate.md
 
 # Generated PWA Files
 /public/assets/*manifest.json
+
+# Rust
+/target/
+/frontend/dist/
