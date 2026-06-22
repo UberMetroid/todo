@@ -42,12 +42,18 @@ RUN apk add --no-cache wget libc6-compat
 COPY --from=backend-builder /app/target/release/backend /app/backend
 COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 
+# Setup data directory with correct ownership
+RUN mkdir -p /app/data && chown -R nobody:nobody /app
+
 # Expose server port (internal port)
-EXPOSE 3000
+EXPOSE 4403
 
 # Healthcheck
 HEALTHCHECK --interval=20s --timeout=5s --start-period=20s --retries=3 \
-    CMD wget --spider -q http://127.0.0.1:3000/api/config || exit 1
+    CMD wget --spider -q http://127.0.0.1:4403/api/config || exit 1
+
+# Run as nobody
+USER nobody
 
 # Run the server
 CMD ["/app/backend"]

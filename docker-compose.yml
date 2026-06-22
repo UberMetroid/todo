@@ -5,10 +5,11 @@ services:
     container_name: rustdo
     restart: unless-stopped
     ports:
-      - ${RUSTDO_PORT:-3000}:3000
+      - ${RUSTDO_PORT:-4403}:4403
     volumes:
       - ${RUSTDO_DATA_PATH:-./data}:/app/data
     environment:
+      - PORT=4403
       - RUSTDO_PIN=${RUSTDO_PIN-}
       - RUSTDO_SITE_TITLE=RustDo
       - SINGLE_LIST=${SINGLE_LIST:-false}

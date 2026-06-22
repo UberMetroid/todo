@@ -1,8 +1,6 @@
 use crate::api;
 use crate::i18n::{use_i18n, TransKey};
-use crate::list_handlers;
 use crate::todo_form::TodoForm;
-use crate::todo_header::TodoHeader;
 use crate::todo_items_list::TodoItemsList;
 use crate::todo_list_handlers;
 use crate::types::ToastType;
@@ -23,9 +21,8 @@ pub struct TodoListProps {
 #[function_component(TodoList)]
 pub fn todo_list(props: &TodoListProps) -> Html {
     let (locale, _, t) = use_i18n();
-    let custom_select_open = use_state(|| false);
     let editing_todo_id = use_state(|| None::<String>);
-    let edit_input_value = use_state(|| String::new());
+    let edit_input_value = use_state(String::new);
     let dragged_todo_id = use_state(|| None::<String>);
     let edit_ref = use_node_ref();
 
@@ -35,17 +32,6 @@ pub fn todo_list(props: &TodoListProps) -> Html {
 
     let active_count = current_list_todos.iter().filter(|t| !t.completed).count();
     let completed_count = current_list_todos.iter().filter(|t| t.completed).count();
-
-    let mut lists_keys: Vec<String> = todos_data.keys().cloned().collect();
-    lists_keys.sort_by(|a, b| {
-        if a == "List 1" {
-            return std::cmp::Ordering::Less;
-        }
-        if b == "List 1" {
-            return std::cmp::Ordering::Greater;
-        }
-        a.cmp(b)
-    });
 
     let save_list_todos = {
         let todos = props.todos.clone();
@@ -109,52 +95,10 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         locale,
     );
 
-    let on_list_change =
-        list_handlers::list_change_handler(props.current_list.clone(), custom_select_open.clone());
-
-    let on_add_list = list_handlers::add_list_handler(
-        todos_data.clone(),
-        props.current_list.clone(),
-        save_list_todos.clone(),
-        props.show_toast.clone(),
-        locale,
-    );
-
-    let on_rename_list = list_handlers::rename_list_handler(
-        todos_data.clone(),
-        props.current_list.clone(),
-        save_list_todos.clone(),
-        props.show_toast.clone(),
-        locale,
-    );
-
-    let on_delete_list = list_handlers::delete_list_handler(
-        todos_data,
-        props.current_list.clone(),
-        save_list_todos,
-        props.show_toast.clone(),
-        locale,
-    );
-
     html! {
         <div class="app">
-            <TodoHeader
-                site_config={props.site_config.clone()}
-                current_list={current_list.clone()}
-                lists_keys={lists_keys}
-                custom_select_open={custom_select_open}
-                on_list_change={on_list_change}
-                on_delete_list={on_delete_list}
-                on_rename_list={on_rename_list}
-                on_add_list={on_add_list}
-                theme={props.theme.clone()}
-                on_toggle_theme={props.on_toggle_theme.clone()}
-            />
             <main>
-                <TodoForm
-                    on_add_todo={on_add_todo}
-                    on_clear_completed={on_clear_completed}
-                />
+                <TodoForm on_add_todo={on_add_todo} />
                 <ul id="todoList" class="todo-list">
                     <div class="active-todos">
                         <TodoItemsList
@@ -186,6 +130,13 @@ pub fn todo_list(props: &TodoListProps) -> Html {
                         is_completed={true}
                     />
                 </ul>
+                if completed_count > 0 {
+                    <div class="list-footer">
+                        <button type="button" class="clear-completed-btn" onclick={on_clear_completed}>
+                            { t.t(TransKey::DeleteCompleted) }
+                        </button>
+                    </div>
+                }
             </main>
         </div>
     }

@@ -42,7 +42,7 @@ pub async fn get_pin_required(
     let lockout_minutes = if locked {
         let elapsed = last_attempt.elapsed();
         let remaining = LOCKOUT_TIME.saturating_sub(elapsed);
-        (remaining.as_secs() + 59) / 60
+        remaining.as_secs().div_ceil(60)
     } else {
         0
     };
@@ -86,7 +86,7 @@ pub async fn verify_pin(
         if let Some(&(failed_count, last_attempt)) = attempts.get(&client_ip) {
             if failed_count >= MAX_ATTEMPTS && last_attempt.elapsed() < LOCKOUT_TIME {
                 let remaining = LOCKOUT_TIME.saturating_sub(last_attempt.elapsed());
-                let minutes = (remaining.as_secs() + 59) / 60;
+                let minutes = remaining.as_secs().div_ceil(60);
                 return (
                     StatusCode::TOO_MANY_REQUESTS,
                     Json(VerifyPinResponse {
@@ -222,3 +222,11 @@ pub async fn save_todos(State(state): State<SharedState>, Json(payload): Json<Va
         _ => (StatusCode::INTERNAL_SERVER_ERROR, "Failed to save todos").into_response(),
     }
 }
+
+pub async fn logout(cookie_jar: CookieJar) -> impl IntoResponse {
+    let cookie = Cookie::build(("RUSTDO_PIN", ""))
+        .path("/")
+        .build();
+    (StatusCode::OK, cookie_jar.remove(cookie))
+}
+

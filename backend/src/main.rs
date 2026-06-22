@@ -15,9 +15,11 @@ mod handlers;
 mod middleware;
 mod state;
 mod static_files;
+#[cfg(test)]
+mod tests;
 
 use auth::run_todo_migrations;
-use handlers::{get_config, get_pin_required, get_todos, save_todos, verify_pin};
+use handlers::{get_config, get_pin_required, get_todos, save_todos, verify_pin, logout};
 use middleware::{auth_middleware, origin_validation_middleware};
 use state::AppState;
 use static_files::{
@@ -29,14 +31,17 @@ async fn main() {
     dotenvy::dotenv().ok();
 
     let port = std::env::var("PORT")
-        .unwrap_or_else(|_| "3000".to_string())
+        .unwrap_or_else(|_| "4403".to_string())
         .parse::<u16>()
-        .unwrap_or(3000);
+        .unwrap_or(4403);
 
     let pin = std::env::var("RUSTDO_PIN")
         .ok()
         .filter(|p| !p.trim().is_empty());
-    let site_title = std::env::var("RUSTDO_SITE_TITLE").unwrap_or_else(|_| "RustDo".to_string());
+    let site_title = std::env::var("RUSTDO_TITLE")
+        .or_else(|_| std::env::var("RUSTDO_SITE_TITLE"))
+        .or_else(|_| std::env::var("SITE_TITLE"))
+        .unwrap_or_else(|_| "RustDo".to_string());
     let single_list = std::env::var("SINGLE_LIST")
         .map(|val| val == "true")
         .unwrap_or(false);
@@ -112,6 +117,7 @@ async fn main() {
         .route("/pin-required", get(get_pin_required))
         .route("/verify-pin", post(verify_pin))
         .route("/config", get(get_config))
+        .route("/logout", post(logout))
         .merge(protected_routes)
         .layer(axum_middleware::from_fn_with_state(
             app_state.clone(),

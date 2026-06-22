@@ -48,16 +48,29 @@ impl Locale {
         }
     }
 
-    pub fn next(self) -> Self {
+    pub fn all() -> &'static [Self] {
+        &[
+            Self::En,
+            Self::Zh,
+            Self::Es,
+            Self::De,
+            Self::Ja,
+            Self::Fr,
+            Self::Pt,
+            Self::Ru,
+        ]
+    }
+
+    pub fn display_label(self) -> &'static str {
         match self {
-            Self::En => Self::Zh,
-            Self::Zh => Self::Es,
-            Self::Es => Self::De,
-            Self::De => Self::Ja,
-            Self::Ja => Self::Fr,
-            Self::Fr => Self::Pt,
-            Self::Pt => Self::Ru,
-            Self::Ru => Self::En,
+            Self::En => "English",
+            Self::Zh => "简体中文",
+            Self::Es => "Español",
+            Self::De => "Deutsch",
+            Self::Ja => "日本語",
+            Self::Fr => "Français",
+            Self::Pt => "Português",
+            Self::Ru => "Русский",
         }
     }
 }

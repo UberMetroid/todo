@@ -33,9 +33,9 @@ pub fn generate_random_id() -> String {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos() as u64;
-        for i in 0..9 {
+        for byte in &mut bytes {
             seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
-            bytes[i] = (seed >> 32) as u8;
+            *byte = (seed >> 32) as u8;
         }
     }
 

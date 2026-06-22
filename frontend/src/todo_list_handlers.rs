@@ -30,7 +30,7 @@ pub fn add_todo_handler(
                 (js_sys::Math::random() * 1000000.0) as u32
             );
             data.entry(current_list.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(TodoItem {
                     id: unique_id,
                     text,

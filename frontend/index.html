@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RustDo - Stupidly Simple Todo List</title>
+    <title>RustDo</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         // Prevent theme flicker by setting theme immediately
         (function() {
-            const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            let theme = localStorage.getItem('theme') || 'dark';
+            if (theme.startsWith('"') && theme.endsWith('"')) {
+                theme = theme.slice(1, -1);
+            }
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
-    <link data-trunk rel="css" href="styles.css">
-    <link data-trunk rel="copy-file" href="service-worker.js" />
-    <link data-trunk rel="copy-file" href="favicon.svg" />
+    <link data-trunk rel="css" href="Assets/base.css">
+    <link data-trunk rel="css" href="Assets/header.css">
+    <link data-trunk rel="css" href="Assets/login.css">
+    <link data-trunk rel="css" href="Assets/app.css">
+    <link data-trunk rel="copy-file" href="Assets/service-worker.js" />
+    <link data-trunk rel="copy-file" href="Assets/favicon.svg" />
 </head>
 <body>
     <script>

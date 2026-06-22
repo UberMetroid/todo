@@ -33,3 +33,10 @@ pub async fn save_todos(todos: &TodoLists) -> Result<bool, gloo_net::Error> {
     let resp = Request::post("/api/todos").json(todos)?.send().await?;
     Ok(resp.ok())
 }
+
+// Submits a POST request to logout and clear authentication cookies
+pub async fn logout() -> Result<bool, gloo_net::Error> {
+    let resp = Request::post("/api/logout").send().await?;
+    Ok(resp.ok())
+}
+
