@@ -13,13 +13,51 @@
 }
 
 [data-theme="dark"] {
+    --primary: #60a5fa;
+    --primary-hover: #3b82f6;
     --background: #1a1a1a;
     --container: #2d2d2d;
     --text: white;
     --border: #404040;
     --shadow: 0 2px 4px rgba(0,0,0,0.2);
     --success-status-bg: rgba(96, 165, 250, 0.5);
-    --danger-status-bg:rgba(220, 38, 38, 0.5);
+    --danger-status-bg: rgba(220, 38, 38, 0.5);
+}
+
+[data-theme="nord"] {
+    --primary: #88c0d0;
+    --primary-hover: #81a1c1;
+    --background: #2e3440;
+    --container: #3b4252;
+    --text: #d8dee9;
+    --border: #4c566a;
+    --shadow: 0 2px 4px rgba(0,0,0,0.3);
+    --success-status-bg: rgba(136, 192, 208, 0.5);
+    --danger-status-bg: rgba(191, 97, 106, 0.5);
+}
+
+[data-theme="dracula"] {
+    --primary: #bd93f9;
+    --primary-hover: #ff79c6;
+    --background: #1e1f29;
+    --container: #282a36;
+    --text: #f8f8f2;
+    --border: #44475a;
+    --shadow: 0 2px 4px rgba(0,0,0,0.3);
+    --success-status-bg: rgba(189, 147, 249, 0.5);
+    --danger-status-bg: rgba(255, 85, 85, 0.5);
+}
+
+[data-theme="sepia"] {
+    --primary: #b58900;
+    --primary-hover: #cb4b16;
+    --background: #f4ecd8;
+    --container: #fdf6e3;
+    --text: #433422;
+    --border: #e4d7ba;
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --success-status-bg: rgba(181, 137, 0, 0.5);
+    --danger-status-bg: rgba(220, 50, 47, 0.5);
 }
 
 * {
@@ -406,45 +444,32 @@ input:focus {
     font-size: 0.9rem;
 }
 
-.pin-input-container {
+.pin-wrapper {
     display: flex;
-    gap: 0.5rem;
     justify-content: center;
+    margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-.pin-input-container input.pin-input {
-    width: 35px;
-    height: 45px;
+.pin-input-field {
     text-align: center;
-    font-size: 1.25rem;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    background: var(--container);
+    font-size: 2rem;
+    letter-spacing: 0.5em;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+    background-color: var(--container);
     color: var(--text);
-    transition: all var(--transition);
-    flex: none;
-    max-width: 30px;
-    padding: 0;
-}
-
-.pin-input-container input.pin-input:focus {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
     outline: none;
+    transition: border-color var(--transition);
+}
+
+.pin-input-field:focus {
     border-color: var(--primary);
-}
-
-.pin-input-container input.pin-input.has-value {
-    border-color: var(--primary);
-    background-color: var(--primary);
-    color: white;
-}
-
-[data-theme="dark"] .pin-input-container input.pin-input.has-value {
-    color: white;
-}
-
-[data-theme="light"] .pin-input-container input.pin-input.has-value {
-    color: white;
 }
 
 .pin-error {
