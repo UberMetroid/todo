@@ -1,0 +1,35 @@
+use crate::i18n::TransKey;
+
+pub fn translate(key: TransKey) -> String {
+    match key {
+        TransKey::EnterPin => "输入密码".to_string(),
+        TransKey::LockedOut => "已锁定".to_string(),
+        TransKey::PinDescription => "请输入密码以访问您的待办事项。".to_string(),
+        TransKey::AttemptsRemaining(n) => format!("还剩 {} 次尝试机会", n),
+        TransKey::LockoutNotice(m) => format!("尝试次数过多。已锁定 {} 分钟。", m),
+        TransKey::PinInputPlaceholder(len) => "• ".repeat(len).trim().to_string(),
+        TransKey::WhatNeedsBeDone => "需要做什么？".to_string(),
+        TransKey::Add => "添加".to_string(),
+        TransKey::DeleteCompleted => "删除已完成任务".to_string(),
+        TransKey::CompletedHeader => "已完成".to_string(),
+        TransKey::NoCompletedTasks => "没有已完成任务可供清除".to_string(),
+        TransKey::TaskAdded => "任务已添加".to_string(),
+        TransKey::TaskCompleted => "任务已完成！🎉".to_string(),
+        TransKey::TaskUncompleted => "任务已取消完成".to_string(),
+        TransKey::TaskDeleted => "任务已删除".to_string(),
+        TransKey::TaskUpdated => "任务已更新".to_string(),
+        TransKey::NewListAdded => "新列表已添加".to_string(),
+        TransKey::ListRenamed => "列表已重命名".to_string(),
+        TransKey::ListDeleted => "列表已删除".to_string(),
+        TransKey::RenameCurrentList => "重命名当前列表".to_string(),
+        TransKey::AddNewList => "添加新列表".to_string(),
+        TransKey::HideLists => "隐藏列表".to_string(),
+        TransKey::ManageLists => "管理列表".to_string(),
+        TransKey::ConfirmDeleteTask(t) => format!("确定要删除 \"{}\" 吗？", t),
+        TransKey::ConfirmDeleteCompleted(n) => format!("删除 {} 个已完成任务吗？", n),
+        TransKey::ConfirmDeleteList(l) => format!("确定删除 \"{}\" 及其所有任务吗？", l),
+        TransKey::PromptRenameList => "输入新列表名称：".to_string(),
+        TransKey::ThemeToggle => "切换主题".to_string(),
+        TransKey::ClearedCompleted(n) => format!("已清除 {} 个已完成任务", n),
+    }
+}

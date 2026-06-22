@@ -1,13 +1,14 @@
-use yew::prelude::*;
-use web_sys::MouseEvent;
-use shared::{SiteConfig, TodoLists};
-use crate::types::ToastType;
 use crate::api;
-use crate::todo_header::TodoHeader;
+use crate::i18n::{use_i18n, TransKey};
+use crate::list_handlers;
 use crate::todo_form::TodoForm;
+use crate::todo_header::TodoHeader;
 use crate::todo_items_list::TodoItemsList;
 use crate::todo_list_handlers;
-use crate::i18n::{use_i18n, TransKey};
+use crate::types::ToastType;
+use shared::{SiteConfig, TodoLists};
+use web_sys::MouseEvent;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct TodoListProps {
@@ -37,8 +38,12 @@ pub fn todo_list(props: &TodoListProps) -> Html {
 
     let mut lists_keys: Vec<String> = todos_data.keys().cloned().collect();
     lists_keys.sort_by(|a, b| {
-        if a == "List 1" { return std::cmp::Ordering::Less; }
-        if b == "List 1" { return std::cmp::Ordering::Greater; }
+        if a == "List 1" {
+            return std::cmp::Ordering::Less;
+        }
+        if b == "List 1" {
+            return std::cmp::Ordering::Greater;
+        }
         a.cmp(b)
     });
 
@@ -104,12 +109,10 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         locale,
     );
 
-    let on_list_change = todo_list_handlers::list_change_handler(
-        props.current_list.clone(),
-        custom_select_open.clone(),
-    );
+    let on_list_change =
+        list_handlers::list_change_handler(props.current_list.clone(), custom_select_open.clone());
 
-    let on_add_list = todo_list_handlers::add_list_handler(
+    let on_add_list = list_handlers::add_list_handler(
         todos_data.clone(),
         props.current_list.clone(),
         save_list_todos.clone(),
@@ -117,7 +120,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         locale,
     );
 
-    let on_rename_list = todo_list_handlers::rename_list_handler(
+    let on_rename_list = list_handlers::rename_list_handler(
         todos_data.clone(),
         props.current_list.clone(),
         save_list_todos.clone(),
@@ -125,7 +128,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         locale,
     );
 
-    let on_delete_list = todo_list_handlers::delete_list_handler(
+    let on_delete_list = list_handlers::delete_list_handler(
         todos_data,
         props.current_list.clone(),
         save_list_todos,

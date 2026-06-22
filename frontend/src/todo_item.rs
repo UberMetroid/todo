@@ -1,6 +1,6 @@
-use yew::prelude::*;
-use web_sys::{HtmlInputElement, DragEvent, MouseEvent};
 use shared::TodoItem as SharedTodoItem;
+use web_sys::{DragEvent, HtmlInputElement, MouseEvent};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct TodoItemProps {
@@ -84,7 +84,7 @@ pub fn todo_item_component(props: &TodoItemProps) -> Html {
     };
 
     html! {
-        <li 
+        <li
             class={format!("todo-item {}", if completed { "completed" } else { "" })}
             draggable={(!completed).to_string()}
             {ondragstart}
@@ -93,13 +93,13 @@ pub fn todo_item_component(props: &TodoItemProps) -> Html {
             {ondrop}
         >
             <div class="checkbox-wrapper" onclick={toggle.clone()}>
-                <input 
-                    type="checkbox" 
-                    checked={completed} 
+                <input
+                    type="checkbox"
+                    checked={completed}
                     onchange={move |_| {}}
                 />
             </div>
-            
+
             {
                 if Some(id.clone()) == *props.editing_todo_id {
                     let onblur = {
@@ -134,10 +134,10 @@ pub fn todo_item_component(props: &TodoItemProps) -> Html {
                         }
                     };
                     html! {
-                        <input 
+                        <input
                             ref={props.edit_ref.clone()}
-                            type="text" 
-                            class="edit-input" 
+                            type="text"
+                            class="edit-input"
                             value={(*props.edit_input_value).clone()}
                             {oninput}
                             {onblur}
@@ -152,7 +152,7 @@ pub fn todo_item_component(props: &TodoItemProps) -> Html {
                     }
                 }
             }
-            
+
             <button class="delete-btn" aria-label="Delete todo" onclick={delete}>
                 {"×"}
             </button>
@@ -164,7 +164,7 @@ pub fn todo_item_component(props: &TodoItemProps) -> Html {
 fn linkify_text(text: &str) -> Html {
     let mut elements = Vec::new();
     let mut current_text = String::new();
-    
+
     for word in text.split(' ') {
         if word.starts_with("http://") || word.starts_with("https://") {
             if !current_text.is_empty() {
@@ -180,11 +180,11 @@ fn linkify_text(text: &str) -> Html {
             current_text.push(' ');
         }
     }
-    
+
     if !current_text.is_empty() {
         current_text.pop();
         elements.push(html! { {current_text} });
     }
-    
+
     html! { { for elements } }
 }

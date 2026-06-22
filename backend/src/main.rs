@@ -3,29 +3,26 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use std::{
-    collections::HashMap,
-    net::SocketAddr,
-    sync::Arc,
-    time::Duration,
-};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::Duration};
 use tokio::sync::RwLock;
 use tower_http::{
     cors::{Any, CorsLayer},
     services::ServeDir,
 };
 
-mod state;
 mod auth;
-mod middleware;
 mod handlers;
+mod middleware;
+mod state;
 mod static_files;
 
-use state::AppState;
 use auth::run_todo_migrations;
+use handlers::{get_config, get_pin_required, get_todos, save_todos, verify_pin};
 use middleware::{auth_middleware, origin_validation_middleware};
-use handlers::{get_pin_required, verify_pin, get_config, get_todos, save_todos};
-use static_files::{serve_index, serve_favicon, serve_service_worker, serve_manifest, serve_asset_manifest};
+use state::AppState;
+use static_files::{
+    serve_asset_manifest, serve_favicon, serve_index, serve_manifest, serve_service_worker,
+};
 
 #[tokio::main]
 async fn main() {
@@ -36,7 +33,9 @@ async fn main() {
         .parse::<u16>()
         .unwrap_or(3000);
 
-    let pin = std::env::var("RUSTDO_PIN").ok().filter(|p| !p.trim().is_empty());
+    let pin = std::env::var("RUSTDO_PIN")
+        .ok()
+        .filter(|p| !p.trim().is_empty());
     let site_title = std::env::var("RUSTDO_SITE_TITLE").unwrap_or_else(|_| "RustDo".to_string());
     let single_list = std::env::var("SINGLE_LIST")
         .map(|val| val == "true")

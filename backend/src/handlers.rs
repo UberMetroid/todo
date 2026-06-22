@@ -11,9 +11,9 @@ use std::{
     time::{Duration, Instant},
 };
 
-use shared::{PinRequiredResponse, SiteConfig, VerifyPinRequest, VerifyPinResponse};
-use crate::state::{SharedState, get_client_ip};
 use crate::auth::{secure_compare, MAX_ATTEMPTS};
+use crate::state::{get_client_ip, SharedState};
+use shared::{PinRequiredResponse, SiteConfig, VerifyPinRequest, VerifyPinResponse};
 
 const LOCKOUT_TIME: Duration = Duration::from_secs(15 * 60); // 15 minutes
 
@@ -189,7 +189,8 @@ pub async fn get_config(State(state): State<SharedState>) -> Json<SiteConfig> {
 pub async fn get_todos(State(state): State<SharedState>) -> Response {
     match tokio::fs::read_to_string(&state.data_file).await {
         Ok(content) => {
-            let json: Value = serde_json::from_str(&content).unwrap_or_else(|_| serde_json::json!({}));
+            let json: Value =
+                serde_json::from_str(&content).unwrap_or_else(|_| serde_json::json!({}));
             Json(json).into_response()
         }
         Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Failed to read todos").into_response(),

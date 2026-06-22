@@ -1,7 +1,7 @@
-use yew::prelude::*;
-use shared::SiteConfig;
+use crate::i18n::use_i18n;
 use crate::list_selector::ListSelector;
-use crate::i18n::{use_i18n, Locale};
+use shared::SiteConfig;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct TodoHeaderProps {
@@ -27,11 +27,7 @@ pub fn todo_header(props: &TodoHeaderProps) -> Html {
         let locale = locale;
         let set_locale = set_locale;
         Callback::from(move |_| {
-            let next = match locale {
-                Locale::En => Locale::Es,
-                Locale::Es => Locale::En,
-            };
-            set_locale.emit(next);
+            set_locale.emit(locale.next());
         })
     };
 
@@ -51,7 +47,7 @@ pub fn todo_header(props: &TodoHeaderProps) -> Html {
             }
             <div class="header-controls">
                 <button id="langToggle" class="lang-toggle-header" onclick={on_toggle_lang} aria-label="Toggle language">
-                    { if locale == Locale::En { "ES" } else { "EN" } }
+                    { locale.next().to_str().to_uppercase() }
                 </button>
                 <button id="themeToggle" aria-label="Toggle theme" onclick={on_toggle}>
                     {

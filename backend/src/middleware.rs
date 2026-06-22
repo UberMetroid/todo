@@ -38,7 +38,11 @@ pub async fn auth_middleware(
     if is_authenticated(&state, &cookie_jar, &headers) {
         next.run(request).await
     } else {
-        (StatusCode::UNAUTHORIZED, Json(serde_json::json!({ "error": "Invalid PIN" }))).into_response()
+        (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({ "error": "Invalid PIN" })),
+        )
+            .into_response()
     }
 }
 

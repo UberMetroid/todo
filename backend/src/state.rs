@@ -1,14 +1,6 @@
-use std::{
-    collections::HashMap,
-    net::SocketAddr,
-    sync::Arc,
-    time::Instant,
-};
+use axum::{extract::ConnectInfo, http::HeaderMap};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::Instant};
 use tokio::sync::RwLock;
-use axum::{
-    extract::ConnectInfo,
-    http::HeaderMap,
-};
 
 pub struct AppState {
     pub pin: Option<String>,

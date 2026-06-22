@@ -19,7 +19,9 @@ pub async fn fetch_todos_raw() -> Result<Response, gloo_net::Error> {
 // Submits the user input digits to verify cookie authentication
 pub async fn verify_pin(pin: &str) -> Result<VerifyPinResponse, gloo_net::Error> {
     Request::post("/api/verify-pin")
-        .json(&VerifyPinRequest { pin: pin.to_string() })?
+        .json(&VerifyPinRequest {
+            pin: pin.to_string(),
+        })?
         .send()
         .await?
         .json()
@@ -28,9 +30,6 @@ pub async fn verify_pin(pin: &str) -> Result<VerifyPinResponse, gloo_net::Error>
 
 // Saves the entire updated lists structure back to the server
 pub async fn save_todos(todos: &TodoLists) -> Result<bool, gloo_net::Error> {
-    let resp = Request::post("/api/todos")
-        .json(todos)?
-        .send()
-        .await?;
+    let resp = Request::post("/api/todos").json(todos)?.send().await?;
     Ok(resp.ok())
 }

@@ -1,6 +1,6 @@
-use yew::prelude::*;
+use crate::i18n::{use_i18n, TransKey};
 use shared::PinRequiredResponse;
-use crate::i18n::{use_i18n, TransKey, Locale};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct LoginProps {
@@ -81,11 +81,7 @@ pub fn login(props: &LoginProps) -> Html {
         let locale = locale;
         let set_locale = set_locale;
         Callback::from(move |_| {
-            let next = match locale {
-                Locale::En => Locale::Es,
-                Locale::Es => Locale::En,
-            };
-            set_locale.emit(next);
+            set_locale.emit(locale.next());
         })
     };
 
@@ -110,7 +106,7 @@ pub fn login(props: &LoginProps) -> Html {
     html! {
         <div class="login-container">
             <button id="lang-toggle" class="lang-toggle" onclick={on_toggle_lang} aria-label="Toggle language">
-                { if locale == Locale::En { "ES" } else { "EN" } }
+                { locale.next().to_str().to_uppercase() }
             </button>
             <button id="theme-toggle" class="theme-toggle" onclick={props.on_toggle_theme.clone()} aria-label="Toggle theme">
                 {theme_toggle_icon}

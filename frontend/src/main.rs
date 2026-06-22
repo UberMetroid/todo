@@ -1,25 +1,26 @@
-use gloo_timers::callback::Timeout;
 use gloo_storage::{LocalStorage, Storage};
+use gloo_timers::callback::Timeout;
 use yew::prelude::*;
 
-mod types;
 mod api;
-mod toast;
-mod login;
-mod todo_item;
-mod todo_list;
-mod list_selector;
-mod todo_header;
-mod todo_form;
-mod todo_items_list;
-mod todo_list_handlers;
 mod i18n;
+mod list_handlers;
+mod list_selector;
+mod login;
+mod toast;
+mod todo_form;
+mod todo_header;
+mod todo_item;
+mod todo_items_list;
+mod todo_list;
+mod todo_list_handlers;
+mod types;
 
-use types::{Toast, ToastType};
-use toast::ToastList;
 use login::Login;
+use shared::{PinRequiredResponse, SiteConfig, TodoLists};
+use toast::ToastList;
 use todo_list::TodoList;
-use shared::{TodoLists, SiteConfig, PinRequiredResponse};
+use types::{Toast, ToastType};
 
 #[function_component(App)]
 fn app() -> Html {
@@ -28,11 +29,11 @@ fn app() -> Html {
     let authenticated = use_state(|| false);
     let todos = use_state(|| None::<TodoLists>);
     let current_list = use_state(|| "List 1".to_string());
-    
+
     // Toast alerts states
     let toasts = use_state(|| Vec::<Toast>::new());
     let next_toast_id = use_state(|| 0);
-    
+
     // PIN states
     let pin_error = use_state(|| None::<String>);
     let theme = use_state(|| "light".to_string());
@@ -54,7 +55,7 @@ fn app() -> Html {
         Callback::from(move |(message, toast_type): (String, ToastType)| {
             let id = *next_toast_id;
             next_toast_id.set(id + 1);
-            
+
             let mut list = (*toasts).clone();
             list.push(Toast::new(id, message, toast_type));
             toasts.set(list);
@@ -75,7 +76,12 @@ fn app() -> Html {
         let authenticated = authenticated.clone();
         let show_toast = show_toast.clone();
         move || {
-            let (todos, current_list, authenticated, show_toast) = (todos.clone(), current_list.clone(), authenticated.clone(), show_toast.clone());
+            let (todos, current_list, authenticated, show_toast) = (
+                todos.clone(),
+                current_list.clone(),
+                authenticated.clone(),
+                show_toast.clone(),
+            );
             wasm_bindgen_futures::spawn_local(async move {
                 match api::fetch_todos_raw().await {
                     Ok(resp) => {
@@ -106,7 +112,8 @@ fn app() -> Html {
         let load_todos = load_todos.clone();
         let theme = theme.clone();
         use_effect_with((), move |_| {
-            let local_theme: String = LocalStorage::get("theme").unwrap_or_else(|_| "light".to_string());
+            let local_theme: String =
+                LocalStorage::get("theme").unwrap_or_else(|_| "light".to_string());
             let document = web_sys::window().unwrap().document().unwrap();
             let element = document.document_element().unwrap();
             let _ = element.set_attribute("data-theme", &local_theme);
@@ -137,7 +144,12 @@ fn app() -> Html {
                 "dracula" => "sepia",
                 _ => "light",
             };
-            let el = web_sys::window().unwrap().document().unwrap().document_element().unwrap();
+            let el = web_sys::window()
+                .unwrap()
+                .document()
+                .unwrap()
+                .document_element()
+                .unwrap();
             let _ = el.set_attribute("data-theme", new);
             let _ = LocalStorage::set("theme", new);
             theme.set(new.to_string());
@@ -150,21 +162,32 @@ fn app() -> Html {
         let load_todos = load_todos.clone();
         let show_toast = show_toast.clone();
         move |pin: String| {
-            let (pin_error, pin_required, load_todos, show_toast) = 
-                (pin_error.clone(), pin_required.clone(), load_todos.clone(), show_toast.clone());
+            let (pin_error, pin_required, load_todos, show_toast) = (
+                pin_error.clone(),
+                pin_required.clone(),
+                load_todos.clone(),
+                show_toast.clone(),
+            );
             wasm_bindgen_futures::spawn_local(async move {
                 if let Ok(data) = api::verify_pin(&pin).await {
                     if data.valid {
                         pin_error.set(None);
                         load_todos();
-                        show_toast.emit(("Authenticated successfully 🎉".to_string(), ToastType::Success));
+                        show_toast.emit((
+                            "Authenticated successfully 🎉".to_string(),
+                            ToastType::Success,
+                        ));
                     } else {
                         pin_error.set(data.error.clone());
                         if let Some(left) = data.attempts_left {
                             let mut updated = (*pin_required).clone().unwrap();
                             updated.attempts_left = left;
-                            if let Some(locked) = data.locked { updated.locked = locked; }
-                            if let Some(m) = data.lockout_minutes { updated.lockout_minutes = m; }
+                            if let Some(locked) = data.locked {
+                                updated.locked = locked;
+                            }
+                            if let Some(m) = data.lockout_minutes {
+                                updated.lockout_minutes = m;
+                            }
                             pin_required.set(Some(updated));
                         }
                     }
