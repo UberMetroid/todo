@@ -7,6 +7,7 @@ use crate::todo_header::TodoHeader;
 use crate::todo_form::TodoForm;
 use crate::todo_items_list::TodoItemsList;
 use crate::todo_list_handlers;
+use crate::i18n::{use_i18n, TransKey};
 
 #[derive(Properties, PartialEq)]
 pub struct TodoListProps {
@@ -20,6 +21,7 @@ pub struct TodoListProps {
 
 #[function_component(TodoList)]
 pub fn todo_list(props: &TodoListProps) -> Html {
+    let (locale, _, t) = use_i18n();
     let custom_select_open = use_state(|| false);
     let editing_todo_id = use_state(|| None::<String>);
     let edit_input_value = use_state(|| String::new());
@@ -60,6 +62,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         current_list.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_toggle_todo = todo_list_handlers::toggle_todo_handler(
@@ -67,6 +70,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         current_list.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_delete_todo = todo_list_handlers::delete_todo_handler(
@@ -74,6 +78,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         current_list.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_edit_save_todo = todo_list_handlers::edit_save_todo_handler(
@@ -81,6 +86,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         current_list.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_drag_reorder_todo = todo_list_handlers::drag_reorder_todo_handler(
@@ -95,6 +101,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         current_list_todos.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_list_change = todo_list_handlers::list_change_handler(
@@ -107,6 +114,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         props.current_list.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_rename_list = todo_list_handlers::rename_list_handler(
@@ -114,6 +122,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         props.current_list.clone(),
         save_list_todos.clone(),
         props.show_toast.clone(),
+        locale,
     );
 
     let on_delete_list = todo_list_handlers::delete_list_handler(
@@ -121,6 +130,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
         props.current_list.clone(),
         save_list_todos,
         props.show_toast.clone(),
+        locale,
     );
 
     html! {
@@ -158,7 +168,7 @@ pub fn todo_list(props: &TodoListProps) -> Html {
                         />
                     </div>
                     if active_count > 0 && completed_count > 0 {
-                        <li class="todo-divider">{"Completed"}</li>
+                        <li class="todo-divider">{t.t(TransKey::CompletedHeader)}</li>
                     }
                     <TodoItemsList
                         current_list_todos={current_list_todos.clone()}

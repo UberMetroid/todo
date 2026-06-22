@@ -1,5 +1,6 @@
 use yew::prelude::*;
 use shared::PinRequiredResponse;
+use crate::i18n::{use_i18n, TransKey, Locale};
 
 #[derive(Properties, PartialEq)]
 pub struct LoginProps {
@@ -13,7 +14,8 @@ pub struct LoginProps {
 #[function_component(Login)]
 pub fn login(props: &LoginProps) -> Html {
     let pr = &props.pin_required;
-    
+    let (locale, set_locale, t) = use_i18n();
+
     let pin_input = use_state(|| "".to_string());
     let input_ref = use_node_ref();
 
@@ -75,6 +77,18 @@ pub fn login(props: &LoginProps) -> Html {
         })
     };
 
+    let on_toggle_lang = {
+        let locale = locale;
+        let set_locale = set_locale;
+        Callback::from(move |_| {
+            let next = match locale {
+                Locale::En => Locale::Es,
+                Locale::Es => Locale::En,
+            };
+            set_locale.emit(next);
+        })
+    };
+
     let theme_toggle_icon = match props.theme.as_str() {
         "dark" => html! {
             <svg id="moon-icon" class="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>
@@ -95,6 +109,9 @@ pub fn login(props: &LoginProps) -> Html {
 
     html! {
         <div class="login-container">
+            <button id="lang-toggle" class="lang-toggle" onclick={on_toggle_lang} aria-label="Toggle language">
+                { if locale == Locale::En { "ES" } else { "EN" } }
+            </button>
             <button id="theme-toggle" class="theme-toggle" onclick={props.on_toggle_theme.clone()} aria-label="Toggle theme">
                 {theme_toggle_icon}
             </button>
@@ -104,9 +121,9 @@ pub fn login(props: &LoginProps) -> Html {
                     <h2 id="pin-description">
                         {
                             if pr.locked {
-                                format!("Locked out. Try again in {} minutes.", pr.lockout_minutes)
+                                t.t(TransKey::LockoutNotice(pr.lockout_minutes as usize))
                             } else {
-                                "Enter PIN".to_string()
+                                t.t(TransKey::EnterPin)
                             }
                         }
                     </h2>
@@ -120,7 +137,7 @@ pub fn login(props: &LoginProps) -> Html {
                             value={(*pin_input).clone()}
                             oninput={on_input}
                             disabled={pr.locked}
-                            placeholder={"• ".repeat(pr.length).trim().to_string()}
+                            placeholder={t.t(TransKey::PinInputPlaceholder(pr.length))}
                             maxlength={pr.length.to_string()}
                             autofocus=true
                         />
@@ -129,12 +146,12 @@ pub fn login(props: &LoginProps) -> Html {
                 <div class="pin-status">
                     if pr.locked {
                         <p id="lockoutNotice" class="lockout-notice" style="display: block;">
-                            { format!("Too many attempts. Locked out for {} minutes.", pr.lockout_minutes) }
+                            { t.t(TransKey::LockoutNotice(pr.lockout_minutes as usize)) }
                         </p>
                     } else {
                         if pr.attempts_left < 5 {
                             <p id="attemptsRemaining" class="attempts-remaining" style="display: block;">
-                                { format!("{} attempt{} remaining", pr.attempts_left, if pr.attempts_left == 1 { "" } else { "s" }) }
+                                { t.t(TransKey::AttemptsRemaining(pr.attempts_left)) }
                             </p>
                         }
                     }

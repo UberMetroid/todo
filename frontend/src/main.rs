@@ -13,6 +13,7 @@ mod todo_header;
 mod todo_form;
 mod todo_items_list;
 mod todo_list_handlers;
+mod i18n;
 
 use types::{Toast, ToastType};
 use toast::ToastList;
@@ -35,6 +36,17 @@ fn app() -> Html {
     // PIN states
     let pin_error = use_state(|| None::<String>);
     let theme = use_state(|| "light".to_string());
+    let locale = use_state(|| {
+        let local_lang: String = LocalStorage::get("lang").unwrap_or_else(|_| "en".to_string());
+        i18n::Locale::from_str(&local_lang)
+    });
+
+    {
+        let locale = locale.clone();
+        use_effect_with(locale.clone(), move |loc| {
+            let _ = LocalStorage::set("lang", loc.to_str());
+        });
+    }
 
     let show_toast = {
         let toasts = toasts.clone();
@@ -164,7 +176,7 @@ fn app() -> Html {
     let is_auth = *authenticated || pin_required.as_ref().map(|pr| !pr.required).unwrap_or(true);
 
     html! {
-        <>
+        <ContextProvider<i18n::I18nContext> context={locale}>
             if is_auth {
                 if let (Some(config), Some(_)) = (site_config.as_ref(), todos.as_ref()) {
                     <TodoList
@@ -188,7 +200,7 @@ fn app() -> Html {
                 }
             }
             <ToastList toasts={(*toasts).clone()} />
-        </>
+        </ContextProvider<i18n::I18nContext>>
     }
 }
 

@@ -3,12 +3,14 @@ use web_sys::{HtmlInputElement, HtmlFormElement, MouseEvent};
 use wasm_bindgen::JsCast;
 use shared::{TodoLists, TodoItem};
 use crate::types::ToastType;
+use crate::i18n::{translate, TransKey, Locale};
 
 pub fn add_todo_handler(
     todos_data: TodoLists,
     current_list: String,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<SubmitEvent> {
     Callback::from(move |e: SubmitEvent| {
         e.prevent_default();
@@ -21,7 +23,7 @@ pub fn add_todo_handler(
             data.entry(current_list.clone()).or_insert_with(Vec::new).push(TodoItem { id: unique_id, text, completed: false });
             save_list_todos.emit(data);
             input_el.set_value("");
-            show_toast.emit(("Task added".to_string(), ToastType::Success));
+            show_toast.emit((translate(locale, TransKey::TaskAdded), ToastType::Success));
         }
     })
 }
@@ -31,14 +33,19 @@ pub fn toggle_todo_handler(
     current_list: String,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<String> {
     Callback::from(move |id: String| {
         let mut data = todos_data.clone();
         if let Some(item) = data.get_mut(&current_list).and_then(|l| l.iter_mut().find(|t| t.id == id)) {
             item.completed = !item.completed;
-            let msg = if item.completed { "Task completed! 🎉" } else { "Task uncompleted" };
+            let msg = if item.completed {
+                translate(locale, TransKey::TaskCompleted)
+            } else {
+                translate(locale, TransKey::TaskUncompleted)
+            };
             save_list_todos.emit(data);
-            show_toast.emit((msg.to_string(), ToastType::Success));
+            show_toast.emit((msg, ToastType::Success));
         }
     })
 }
@@ -48,15 +55,16 @@ pub fn delete_todo_handler(
     current_list: String,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<(String, String)> {
     Callback::from(move |(id, text): (String, String)| {
         let window = web_sys::window().unwrap();
-        if window.confirm_with_message(&format!("Are you sure you want to delete \"{}\"?", text)).unwrap_or(false) {
+        if window.confirm_with_message(&translate(locale, TransKey::ConfirmDeleteTask(text))).unwrap_or(false) {
             let mut data = todos_data.clone();
             if let Some(list) = data.get_mut(&current_list) {
                 list.retain(|t| t.id != id);
                 save_list_todos.emit(data);
-                show_toast.emit(("Task deleted".to_string(), ToastType::Error));
+                show_toast.emit((translate(locale, TransKey::TaskDeleted), ToastType::Error));
             }
         }
     })
@@ -67,6 +75,7 @@ pub fn edit_save_todo_handler(
     current_list: String,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<(String, String)> {
     Callback::from(move |(id, new_text): (String, String)| {
         let clean_text = new_text.trim().to_string();
@@ -76,7 +85,7 @@ pub fn edit_save_todo_handler(
                 if item.text != clean_text {
                     item.text = clean_text;
                     save_list_todos.emit(data);
-                    show_toast.emit(("Task updated".to_string(), ToastType::Success));
+                    show_toast.emit((translate(locale, TransKey::TaskUpdated), ToastType::Success));
                 }
             }
         }
@@ -108,18 +117,19 @@ pub fn clear_completed_handler(
     current_list_todos: Vec<TodoItem>,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<MouseEvent> {
     Callback::from(move |_| {
         let completed_count = current_list_todos.iter().filter(|t| t.completed).count();
         if completed_count == 0 {
-            show_toast.emit(("No completed tasks to clear".to_string(), ToastType::Error));
+            show_toast.emit((translate(locale, TransKey::NoCompletedTasks), ToastType::Error));
             return;
         }
-        if web_sys::window().unwrap().confirm_with_message(&format!("Delete {} completed task{}?", completed_count, if completed_count == 1 { "" } else { "s" })).unwrap_or(false) {
+        if web_sys::window().unwrap().confirm_with_message(&translate(locale, TransKey::ConfirmDeleteCompleted(completed_count))).unwrap_or(false) {
             let mut data = todos_data.clone();
             data.get_mut(&current_list).unwrap().retain(|t| !t.completed);
             save_list_todos.emit(data);
-            show_toast.emit((format!("Cleared {} completed task{}", completed_count, if completed_count == 1 { "" } else { "s" }), ToastType::Success));
+            show_toast.emit((translate(locale, TransKey::ClearedCompleted(completed_count)), ToastType::Success));
         }
     })
 }
@@ -139,6 +149,7 @@ pub fn add_list_handler(
     current_list: UseStateHandle<String>,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<()> {
     Callback::from(move |_| {
         let mut data = todos_data.clone();
@@ -146,7 +157,7 @@ pub fn add_list_handler(
         data.insert(list_name.clone(), Vec::new());
         current_list.set(list_name);
         save_list_todos.emit(data);
-        show_toast.emit(("New list added".to_string(), ToastType::Success));
+        show_toast.emit((translate(locale, TransKey::NewListAdded), ToastType::Success));
     })
 }
 
@@ -155,9 +166,10 @@ pub fn rename_list_handler(
     current_list: UseStateHandle<String>,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<()> {
     Callback::from(move |_| {
-        if let Ok(Some(new_name)) = web_sys::window().unwrap().prompt_with_message_and_default("Enter new list name:", &*current_list) {
+        if let Ok(Some(new_name)) = web_sys::window().unwrap().prompt_with_message_and_default(&translate(locale, TransKey::PromptRenameList), &*current_list) {
             let clean_name = new_name.trim().to_string();
             if !clean_name.is_empty() && clean_name != *current_list && !todos_data.contains_key(&clean_name) {
                 let mut data = todos_data.clone();
@@ -165,7 +177,7 @@ pub fn rename_list_handler(
                     data.insert(clean_name.clone(), items);
                     current_list.set(clean_name);
                     save_list_todos.emit(data);
-                    show_toast.emit(("List renamed".to_string(), ToastType::Success));
+                    show_toast.emit((translate(locale, TransKey::ListRenamed), ToastType::Success));
                 }
             }
         }
@@ -177,17 +189,18 @@ pub fn delete_list_handler(
     current_list: UseStateHandle<String>,
     save_list_todos: Callback<TodoLists>,
     show_toast: Callback<(String, ToastType)>,
+    locale: Locale,
 ) -> Callback<String> {
     Callback::from(move |list_name: String| {
         if list_name == "List 1" { return; }
-        if todos_data.len() > 1 && web_sys::window().unwrap().confirm_with_message(&format!("Delete \"{}\" and all its tasks?", list_name)).unwrap_or(false) {
+        if todos_data.len() > 1 && web_sys::window().unwrap().confirm_with_message(&translate(locale, TransKey::ConfirmDeleteList(list_name.clone()))).unwrap_or(false) {
             let mut data = todos_data.clone();
             data.remove(&list_name);
             if *current_list == list_name {
                 current_list.set(data.keys().next().unwrap().clone());
             }
             save_list_todos.emit(data);
-            show_toast.emit(("List deleted".to_string(), ToastType::Success));
+            show_toast.emit((translate(locale, TransKey::ListDeleted), ToastType::Success));
         }
     })
 }

@@ -111,9 +111,6 @@ button:hover {
 }
 
 #themeToggle {
-    position: absolute;
-    top: 0;
-    right: 0;
     background: transparent;
     font-size: 1.5rem;
     padding: 0.5rem;
@@ -800,5 +797,59 @@ input:focus {
     .checkbox-wrapper {
         padding: 0.75rem;
         margin: -0.75rem;
+    }
+}
+
+.lang-toggle {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--text);
+    font-weight: bold;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.lang-toggle:hover {
+    background-color: var(--border);
+}
+
+.header-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lang-toggle-header {
+    background: transparent;
+    border: 2px solid var(--text);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text);
+    font-size: 0.8rem;
+    transition: var(--transition);
+}
+
+.lang-toggle-header:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+@media (max-width: 768px) {
+    .header-controls {
+        position: static;
+        margin-left: auto;
+        margin-top: 0.5rem;
     }
 } 
