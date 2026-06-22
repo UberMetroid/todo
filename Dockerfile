@@ -1,5 +1,6 @@
 # Stage 1: Build the frontend WASM application
 FROM rust:1.96-alpine AS frontend-builder
+ENV CARGO_BUILD_JOBS=1
 RUN apk add --no-cache musl-dev wget tar
 WORKDIR /app
 
@@ -19,6 +20,7 @@ RUN trunk build --release
 
 # Stage 2: Build the backend server
 FROM rust:1.96-alpine AS backend-builder
+ENV CARGO_BUILD_JOBS=1
 RUN apk add --no-cache musl-dev
 WORKDIR /app
 
