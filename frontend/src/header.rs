@@ -38,7 +38,7 @@ pub fn header(props: &HeaderProps) -> Html {
         _ => "Log out",
     };
 
-    let disabled = !props.is_authenticated;
+    let disabled = !props.is_authenticated || !props.is_pin_required;
     let onclick_handler = if disabled {
         Callback::from(|_| ())
     } else {
