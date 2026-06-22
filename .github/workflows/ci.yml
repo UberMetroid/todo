@@ -1,4 +1,4 @@
-name: Rust CI
+name: "Verify Code & Run Tests (CI)"
 
 on:
   push:
@@ -10,35 +10,59 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  ci:
-    name: Continuous Integration
+  fmt:
+    name: Rustfmt
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Rust Toolchain
+      - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt, clippy
+          components: rustfmt
+
+      - name: Check Formatting
+        run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
           targets: wasm32-unknown-unknown
 
-      - name: Cache Cargo Dependencies
+      - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: "rustdo-ci-cache"
-
-      - name: Enforce Formatting
-        run: cargo fmt --all --check
 
       - name: Run Clippy (Deny Warnings)
         run: cargo clippy --workspace --all-targets -- -D warnings
+
+  build:
+    name: Build Backend & WASM Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
 
       - name: Install Trunk
         uses: jetli/trunk-action@v0.5.0
         with:
           version: 'v0.21.14'
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
 
       - name: Build WASM Frontend
         run: |
@@ -48,5 +72,5 @@ jobs:
       - name: Run Tests
         run: cargo test --workspace --exclude frontend
 
-      - name: Build Backend & shared
+      - name: Build Backend
         run: cargo build --release --workspace --exclude frontend

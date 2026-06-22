@@ -96,7 +96,7 @@ async fn test_verify_pin_handler() {
     };
     let res = handlers::verify_pin(
         State(state.clone()),
-        connect_info.clone(),
+        connect_info,
         headers.clone(),
         jar.clone(),
         Json(req),
