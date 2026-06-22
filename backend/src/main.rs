@@ -18,7 +18,8 @@ use handlers::{get_config, get_pin_required, get_todos, save_todos, verify_pin};
 use middleware::{auth_middleware, origin_validation_middleware};
 use state::AppState;
 use static_files::{
-    serve_asset_manifest, serve_favicon, serve_index, serve_manifest, serve_service_worker,
+    build_asset_manifest, serve_asset_manifest, serve_favicon, serve_index, serve_manifest,
+    serve_service_worker,
 };
 
 #[tokio::main]
@@ -56,6 +57,8 @@ async fn main() {
 
     run_todo_migrations(&data_file);
 
+    let asset_manifest = build_asset_manifest();
+
     let app_state = Arc::new(AppState {
         pin,
         site_title,
@@ -63,6 +66,7 @@ async fn main() {
         allowed_origins: allowed_origins.clone(),
         is_production,
         data_file,
+        asset_manifest,
         login_attempts: RwLock::new(HashMap::new()),
     });
 

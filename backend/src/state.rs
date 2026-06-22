@@ -9,6 +9,7 @@ pub struct AppState {
     pub allowed_origins: String,
     pub is_production: bool,
     pub data_file: String,
+    pub asset_manifest: Vec<String>,
     // IP -> (failed_attempts, last_attempt_time)
     pub login_attempts: RwLock<HashMap<String, (usize, Instant)>>,
 }

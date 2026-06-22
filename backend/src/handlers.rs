@@ -108,7 +108,7 @@ pub async fn verify_pin(
     if payload.pin.len() < 4 || payload.pin.len() > 10 {
         let mut attempts = state.login_attempts.write().await;
         let entry = attempts.entry(client_ip).or_insert((0, Instant::now()));
-        entry.0 += 1;
+        entry.0 = entry.0.saturating_add(1);
         entry.1 = Instant::now();
         let left = MAX_ATTEMPTS.saturating_sub(entry.0);
 
@@ -163,7 +163,7 @@ pub async fn verify_pin(
             .into_response()
     } else {
         let entry = attempts.entry(client_ip).or_insert((0, Instant::now()));
-        entry.0 += 1;
+        entry.0 = entry.0.saturating_add(1);
         entry.1 = Instant::now();
         let left = MAX_ATTEMPTS.saturating_sub(entry.0);
 

@@ -67,7 +67,7 @@ fn get_files_recursive(dir: &Path, base: &Path) -> Vec<String> {
     files
 }
 
-pub async fn serve_asset_manifest() -> impl IntoResponse {
+pub fn build_asset_manifest() -> Vec<String> {
     let dist_path = Path::new("frontend/dist");
     let mut files = get_files_recursive(dist_path, dist_path);
     if !files.contains(&"/favicon.svg".to_string()) {
@@ -76,7 +76,11 @@ pub async fn serve_asset_manifest() -> impl IntoResponse {
     if !files.contains(&"/manifest.json".to_string()) {
         files.push("/manifest.json".to_string());
     }
-    Json(files)
+    files
+}
+
+pub async fn serve_asset_manifest(State(state): State<SharedState>) -> impl IntoResponse {
+    Json(state.asset_manifest.clone())
 }
 
 async fn serve_static_file(path: &str, content_type: &str) -> Response {
