@@ -26,6 +26,7 @@ WORKDIR /app
 COPY Cargo.toml /app/Cargo.toml
 COPY shared /app/shared
 COPY backend /app/backend
+COPY frontend /app/frontend
 
 # Build backend
 WORKDIR /app/backend
