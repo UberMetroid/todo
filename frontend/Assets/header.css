@@ -91,8 +91,8 @@ header {
 }
 
 .language-select option {
-    background-color: var(--bg-color, var(--background));
-    color: var(--text-color, var(--text));
+    background-color: var(--bg-color);
+    color: var(--text);
 }
 
 .language-select:hover {
