@@ -23,7 +23,7 @@ use handlers::{get_config, get_pin_required, get_todos, logout, save_todos, veri
 use middleware::{auth_middleware, origin_validation_middleware};
 use state::AppState;
 use static_files::{
-    build_asset_manifest, serve_asset_manifest, serve_favicon, serve_manifest, serve_service_worker,
+    build_asset_manifest, serve_asset_manifest, serve_favicon, serve_favicon_png, serve_manifest, serve_service_worker,
 };
 
 #[tokio::main]
@@ -127,6 +127,7 @@ async fn main() {
     let app = Router::new()
         .nest("/api", api_routes)
         .route("/favicon.svg", get(serve_favicon))
+        .route("/favicon.png", get(serve_favicon_png))
         .route("/manifest.json", get(serve_manifest))
         .route("/asset-manifest.json", get(serve_asset_manifest))
         .route("/service-worker.js", get(serve_service_worker))

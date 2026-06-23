@@ -12,6 +12,10 @@ pub async fn serve_favicon() -> Response {
     serve_static_file("frontend/dist/favicon.svg", "image/svg+xml").await
 }
 
+pub async fn serve_favicon_png() -> Response {
+    serve_static_file("frontend/dist/favicon.png", "image/png").await
+}
+
 pub async fn serve_service_worker() -> Response {
     serve_static_file("frontend/dist/service-worker.js", "application/javascript").await
 }
@@ -31,6 +35,16 @@ pub async fn serve_manifest(State(state): State<SharedState>) -> impl IntoRespon
                 "src": "favicon.svg",
                 "type": "image/svg+xml",
                 "sizes": "any"
+            },
+            {
+                "src": "favicon.png",
+                "type": "image/png",
+                "sizes": "192x192"
+            },
+            {
+                "src": "favicon.png",
+                "type": "image/png",
+                "sizes": "512x512"
             }
         ],
         "orientation": "any"
