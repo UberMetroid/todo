@@ -36,6 +36,7 @@ RUN cargo build --release --bin backend
 
 # Stage 3: Runtime image
 FROM alpine:3.18
+LABEL org.opencontainers.image.source="https://github.com/UberMetroid/RustDo"
 WORKDIR /app
 
 # Install runtime dependencies
