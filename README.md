@@ -70,3 +70,59 @@ Configure these settings inside your Docker Compose environment or container env
 | `RUSTDO_PIN` | Optional 4–10 digit PIN (numerical only) to lock access to the interface. Leave empty for public mode. | None |
 | `TZ` | Timezone for the container processes and logs. | `UTC` |
 | `SINGLE_LIST` | Force UI to hide list switcher and display only a single list. | `false` |
+
+## 📂 Repository Structure
+
+```
+.
+├── backend/
+│   ├── Cargo.toml
+│   └── src
+│       ├── auth.rs
+│       ├── handlers.rs
+│       ├── main.rs
+│       ├── middleware.rs
+│       ├── state.rs
+│       ├── static_files.rs
+│       └── tests.rs
+├── frontend/
+│   ├── Assets
+│   │   ├── app.css
+│   │   ├── base.css
+│   │   ├── favicon.png
+│   │   ├── favicon.svg
+│   │   ├── header.css
+│   │   ├── login.css
+│   │   └── service-worker.js
+│   ├── Cargo.toml
+│   ├── index.html
+│   └── src
+│       ├── api.rs
+│       ├── app.rs
+│       ├── header.rs
+│       ├── i18n
+│       │   ├── de.rs
+│       │   ├── en.rs
+│       │   ├── es.rs
+│       │   ├── fr.rs
+│       │   ├── ja.rs
+│       │   ├── pt.rs
+│       │   ├── ru.rs
+│       │   └── zh.rs
+│       ├── i18n.rs
+│       ├── login.rs
+│       ├── main.rs
+│       ├── storage.rs
+│       ├── theme.rs
+│       ├── toast.rs
+│       ├── todo_form.rs
+│       ├── todo_item.rs
+│       ├── todo_items_list.rs
+│       ├── todo_list.rs
+│       ├── todo_list_handlers.rs
+│       └── types.rs
+└── shared/
+    ├── Cargo.toml
+    └── src
+        └── lib.rs
+```
