@@ -28,21 +28,7 @@ pub fn app() -> Html {
     let active_notification = use_state(|| None::<(String, String)>);
     let active_timeout = use_mut_ref(|| None::<Timeout>);
     let pin_error = use_state(|| None::<String>);
-    let theme = use_state(|| {
-        let raw = StorageService::get_item("theme", "crateria");
-        let theme = match raw.as_str() {
-            "light" => "brinstar".to_string(),
-            "dark" => "crateria".to_string(),
-            "nord" => "maridia".to_string(),
-            "dracula" => "wrecked_ship".to_string(),
-            "sepia" => "norfair".to_string(),
-            t => t.to_string(),
-        };
-        if theme != raw {
-            StorageService::set_item("theme", &theme);
-        }
-        theme
-    });
+    let (theme, toggle_theme) = crate::theme::use_theme();
     let locale = use_state(|| {
         let local_lang = StorageService::get_item("lang", "en");
         i18n::Locale::from_str(&local_lang)
@@ -140,29 +126,7 @@ pub fn app() -> Html {
         });
     }
 
-    let toggle_theme = {
-        let theme = theme.clone();
-        move |_| {
-            let new = match theme.as_str() {
-                "crateria" => "brinstar",
-                "brinstar" => "norfair",
-                "norfair" => "wrecked_ship",
-                "wrecked_ship" => "maridia",
-                "maridia" => "tourian",
-                _ => "crateria",
-            };
-            let el = web_sys::window()
-                .unwrap()
-                .document()
-                .unwrap()
-                .document_element()
-                .unwrap();
-            let _ = el.set_attribute("data-theme", new);
-            let _ = el.set_attribute("class", new);
-            StorageService::set_item("theme", new);
-            theme.set(new.to_string());
-        }
-    };
+
 
     let verify_submit_pin = {
         let (pin_error, pin_required, load_todos, show_toast) = (

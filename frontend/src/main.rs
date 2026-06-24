@@ -16,6 +16,7 @@ mod todo_item;
 mod todo_items_list;
 mod todo_list;
 mod todo_list_handlers;
+mod theme;
 mod types;
 
 fn main() {

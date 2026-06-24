@@ -20,7 +20,7 @@ mod tests;
 
 use auth::run_todo_migrations;
 use handlers::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
-use middleware::{auth_middleware, origin_validation_middleware};
+use middleware::{auth_middleware, origin_validation_middleware, security_headers_middleware};
 use state::AppState;
 use static_files::{
     build_asset_manifest, serve_asset_manifest, serve_favicon, serve_favicon_png, serve_manifest,
@@ -137,6 +137,7 @@ async fn main() {
             ServeDir::new("frontend/dist").fallback(ServeFile::new("frontend/dist/index.html")),
         )
         .layer(cors)
+        .layer(axum_middleware::from_fn(security_headers_middleware))
         .with_state(app_state.clone());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
