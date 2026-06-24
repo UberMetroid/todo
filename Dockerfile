@@ -35,7 +35,7 @@ WORKDIR /app/backend
 RUN cargo build --release --bin backend
 
 # Stage 3: Runtime image
-FROM alpine:3.18
+FROM alpine:latest
 LABEL org.opencontainers.image.source="https://github.com/UberMetroid/RustDo"
 WORKDIR /app
 
