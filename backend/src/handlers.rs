@@ -53,6 +53,7 @@ pub async fn get_pin_required(
         locked,
         attempts_left,
         lockout_minutes,
+        enable_translation: state.enable_translation,
     })
 }
 

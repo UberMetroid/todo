@@ -11,6 +11,7 @@ pub struct HeaderProps {
     pub is_pin_required: bool,
     pub on_logout: Callback<MouseEvent>,
     pub disable_print: bool,
+    pub enable_translation: bool,
 }
 
 // Renders the header section of the todo application with header-title, list selector, and header-right controls
@@ -80,25 +81,31 @@ pub fn header(props: &HeaderProps) -> Html {
                 <h1>{ &props.site_config.site_title }</h1>
             </div>
             <div class="header-right">
-                <div class="language-select-container">
-                    <select
-                        class="language-select"
-                        id="language-select"
-                        value={locale.to_str()}
-                        onchange={on_select_lang}
-                        aria-label="Select language"
-                    >
-                        {
-                            for crate::i18n::Locale::all().iter().map(|loc| {
-                                html! {
-                                    <option value={loc.to_str()} selected={*loc == locale}>
-                                        { loc.display_label() }
-                                    </option>
+                {if props.enable_translation {
+                    html! {
+                        <div class="language-select-container">
+                            <select
+                                class="language-select"
+                                id="language-select"
+                                value={locale.to_str()}
+                                onchange={on_select_lang}
+                                aria-label="Select language"
+                            >
+                                {
+                                    for crate::i18n::Locale::all().iter().map(|loc| {
+                                        html! {
+                                            <option value={loc.to_str()} selected={*loc == locale}>
+                                                { loc.display_label() }
+                                            </option>
+                                        }
+                                    })
                                 }
-                            })
-                        }
-                    </select>
-                </div>
+                            </select>
+                        </div>
+                    }
+                } else {
+                    html! {}
+                }}
                 <button id="theme-toggle" class="icon-button" aria-label="Toggle theme" onclick={on_toggle} title={theme_toggle_tooltip}>
                     {
                         match props.theme.as_str() {

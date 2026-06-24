@@ -20,6 +20,7 @@ pub fn app() -> Html {
             locked: false,
             attempts_left: 5,
             lockout_minutes: 15,
+            enable_translation: false,
         })
     });
     let authenticated = use_state(|| false);
@@ -198,6 +199,8 @@ pub fn app() -> Html {
 
     let disable_print = todos.as_ref().map(|t| t.values().all(|v| v.is_empty())).unwrap_or(true);
 
+    let enable_translation = pin_required.as_ref().map(|p| p.enable_translation).unwrap_or(false);
+
     html! {
         <ContextProvider<i18n::I18nContext> context={locale}>
             <Header
@@ -208,6 +211,7 @@ pub fn app() -> Html {
                 is_pin_required={is_pin_required}
                 on_logout={on_logout}
                 disable_print={disable_print}
+                enable_translation={enable_translation}
             />
             <div class="container">
                 if is_auth {

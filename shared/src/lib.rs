@@ -26,6 +26,7 @@ pub struct PinRequiredResponse {
     pub locked: bool,
     pub attempts_left: usize,
     pub lockout_minutes: u64,
+    pub enable_translation: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]

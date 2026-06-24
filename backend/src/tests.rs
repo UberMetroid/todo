@@ -43,6 +43,8 @@ async fn test_get_config_handler() {
         data_file: "test_todos.json".to_string(),
         asset_manifest: vec![],
         login_attempts: RwLock::new(HashMap::new()),
+        enable_translation: false,
+        max_attempts: 5,
     });
 
     let config = handlers::get_config(State(state)).await;
@@ -61,6 +63,8 @@ async fn test_get_pin_required_handler() {
         data_file: "test_todos.json".to_string(),
         asset_manifest: vec![],
         login_attempts: RwLock::new(HashMap::new()),
+        enable_translation: false,
+        max_attempts: 5,
     });
 
     let connect_info = ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 12345)));
@@ -84,6 +88,8 @@ async fn test_verify_pin_handler() {
         data_file: "test_todos.json".to_string(),
         asset_manifest: vec![],
         login_attempts: RwLock::new(HashMap::new()),
+        enable_translation: false,
+        max_attempts: 5,
     });
 
     let connect_info = ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 12345)));

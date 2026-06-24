@@ -73,6 +73,10 @@ async fn main() {
         .and_then(|val| val.parse().ok())
         .unwrap_or(5);
 
+    let enable_translation = std::env::var("ENABLE_TRANSLATION")
+        .map(|v| v == "true" || v == "on")
+        .unwrap_or(false);
+
     let app_state = Arc::new(AppState {
         pin,
         site_title,
@@ -82,6 +86,7 @@ async fn main() {
         data_file,
         asset_manifest,
         max_attempts,
+        enable_translation,
         login_attempts: RwLock::new(HashMap::new()),
     });
 
