@@ -2,7 +2,6 @@ use shared::TodoLists;
 use std::fs::File;
 use std::io::Read;
 
-
 // Cryptographically secure constant-time string comparison
 pub fn secure_compare(a: &str, b: &str) -> bool {
     if a.len() != b.len() {
@@ -20,7 +19,10 @@ pub fn hash_pin(pin: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(pin.as_bytes());
     let result = hasher.finalize();
-    result.iter().map(|b| format!("{:02x}", b)).collect::<String>()
+    result
+        .iter()
+        .map(|b| format!("{:02x}", b))
+        .collect::<String>()
 }
 
 // Generate random alphanumeric 9-character ID using /dev/urandom or LCG

@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use crate::storage::StorageService;
+use yew::prelude::*;
 
 #[hook]
 pub fn use_theme() -> (UseStateHandle<String>, Callback<MouseEvent>) {

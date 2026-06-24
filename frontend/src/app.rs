@@ -127,8 +127,6 @@ pub fn app() -> Html {
         });
     }
 
-
-
     let verify_submit_pin = {
         let (pin_error, pin_required, load_todos, show_toast) = (
             pin_error.clone(),
@@ -197,9 +195,15 @@ pub fn app() -> Html {
         })
     };
 
-    let disable_print = todos.as_ref().map(|t| t.values().all(|v| v.is_empty())).unwrap_or(true);
+    let disable_print = todos
+        .as_ref()
+        .map(|t| t.values().all(|v| v.is_empty()))
+        .unwrap_or(true);
 
-    let enable_translation = pin_required.as_ref().map(|p| p.enable_translation).unwrap_or(false);
+    let enable_translation = pin_required
+        .as_ref()
+        .map(|p| p.enable_translation)
+        .unwrap_or(false);
 
     html! {
         <ContextProvider<i18n::I18nContext> context={locale}>

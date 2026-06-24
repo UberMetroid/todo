@@ -11,7 +11,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::auth::{secure_compare, hash_pin};
+use crate::auth::{hash_pin, secure_compare};
 use crate::state::{get_client_ip, SharedState};
 use shared::{PinRequiredResponse, SiteConfig, VerifyPinRequest, VerifyPinResponse};
 
