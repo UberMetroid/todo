@@ -1,10 +1,10 @@
-# RustDo - Blazing Fast Todo List
+# Adam - Blazing Fast Todo List
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/UberMetroid/RustDo/main/frontend/Assets/favicon.png" alt="RustDo Logo" width="128" height="128">
+  <img src="https://raw.githubusercontent.com/UberMetroid/Adam/main/frontend/Assets/favicon.png" alt="Adam Logo" width="128" height="128">
 </p>
 
-RustDo is a blazing fast, single-purpose todo list application written in 100% Rust using Axum on the backend and Yew (WebAssembly) on the frontend.
+Adam is a blazing fast, single-purpose todo list application written in 100% Rust using Axum on the backend and Yew (WebAssembly) on the frontend.
 
 ---
 
@@ -17,9 +17,9 @@ RustDo is a blazing fast, single-purpose todo list application written in 100% R
 ```yaml
 version: '3'
 services:
-  rustdo:
-    image: ubermetroid/rustdo:latest
-    container_name: rustdo
+  adam:
+    image: ubermetroid/adam:latest
+    container_name: adam
     restart: unless-stopped
     ports:
       - 4403:4403
@@ -27,8 +27,8 @@ services:
       - ./data:/app/data
     environment:
       - PORT=4403
-      - RUSTDO_PIN=1234
-      - RUSTDO_SITE_TITLE=RustDo
+      - ADAM_PIN=1234
+      - ADAM_SITE_TITLE=Adam
       - SINGLE_LIST=false
       - ALLOWED_ORIGINS=*
 ```
@@ -47,12 +47,12 @@ Run the following command to start the container:
 
 ```bash
 docker run -d \
-  --name rustdo \
+  --name adam \
   --restart unless-stopped \
   -p 4403:4403 \
   -v $(pwd)/data:/app/data \
-  -e RUSTDO_PIN=1234 \
-  ubermetroid/rustdo:latest
+  -e ADAM_PIN=1234 \
+  ubermetroid/adam:latest
 ```
 
 ---
@@ -64,10 +64,10 @@ Configure these settings inside your Docker Compose environment or container env
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `PORT` | The port number the backend HTTP server will bind to inside the container. | `4403` |
-| `SITE_TITLE` | Custom website title rendered in navigation headers, browser tabs, and PWA manifest. *(Supports fallback `RUSTRUSTDO_TITLE`)* | `RustDo` |
+| `SITE_TITLE` | Custom website title rendered in navigation headers, browser tabs, and PWA manifest. *(Supports fallback `RUSTADAM_TITLE`)* | `Adam` |
 | `BASE_URL` | Application base URL. Essential when deploying behind reverse proxies to ensure redirect and websocket links are resolved correctly. | `http://localhost:4403` |
 | `ALLOWED_ORIGINS` | Comma-separated list of allowed HTTP request origins (CORS filter). Use `*` to allow all origins. | `*` |
-| `RUSTDO_PIN` | Optional 4–10 digit PIN (numerical only) to lock access to the interface. Leave empty for public mode. | None |
+| `ADAM_PIN` | Optional 4–10 digit PIN (numerical only) to lock access to the interface. Leave empty for public mode. | None |
 | `TZ` | Timezone for the container processes and logs. | `UTC` |
 | `SINGLE_LIST` | Force UI to hide list switcher and display only a single list. | `false` |
 | `ENABLE_TRANSLATION` | Enable the multi-language / translation selector in the navigation header (true/false). | `false` |
@@ -130,3 +130,8 @@ Configure these settings inside your Docker Compose environment or container env
     └── src
         └── lib.rs
 ```
+
+
+---
+
+*Note: This repository was forked from [RustDo](https://github.com/UberMetroid/RustDo).*

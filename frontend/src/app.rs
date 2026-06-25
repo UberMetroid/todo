@@ -188,7 +188,7 @@ pub fn app() -> Html {
             .map(|pr| !pr.required)
             .unwrap_or(false);
     let site_config_fallback = site_config.as_ref().cloned().unwrap_or_else(|| SiteConfig {
-        site_title: "RustDo".to_string(),
+        site_title: "Adam".to_string(),
         single_list: false,
         enable_themes: true,
         enable_print: true,

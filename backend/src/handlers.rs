@@ -149,7 +149,7 @@ pub async fn verify_pin(
             .map(|v| v.eq_ignore_ascii_case("https"))
             .unwrap_or(false);
 
-        let cookie = Cookie::build(("RUSTDO_PIN", hash_pin(&payload.pin)))
+        let cookie = Cookie::build(("ADAM_PIN", hash_pin(&payload.pin)))
             .http_only(true)
             .secure(is_secure)
             .same_site(axum_extra::extract::cookie::SameSite::Strict)
@@ -235,6 +235,6 @@ pub async fn save_todos(State(state): State<SharedState>, Json(payload): Json<Va
 }
 
 pub async fn logout(cookie_jar: CookieJar) -> impl IntoResponse {
-    let cookie = Cookie::build(("RUSTDO_PIN", "")).path("/").build();
+    let cookie = Cookie::build(("ADAM_PIN", "")).path("/").build();
     (StatusCode::OK, cookie_jar.remove(cookie))
 }

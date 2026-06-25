@@ -2,7 +2,7 @@
 //
 // Provides unified read/write methods with quote stripping.
 //
-// Copyright (c) 2026 RustDo Authors. All rights reserved.
+// Copyright (c) 2026 Adam Authors. All rights reserved.
 
 pub struct StorageService;
 

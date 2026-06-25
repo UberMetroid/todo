@@ -94,14 +94,14 @@ async fn main() {
         .parse::<u16>()
         .unwrap_or(4403);
 
-    let pin = std::env::var("RUSTDO_PIN")
+    let pin = std::env::var("ADAM_PIN")
         .or_else(|_| std::env::var("PIN"))
         .ok()
         .filter(|p| !p.trim().is_empty());
-    let site_title = std::env::var("RUSTDO_TITLE")
-        .or_else(|_| std::env::var("RUSTDO_SITE_TITLE"))
+    let site_title = std::env::var("ADAM_TITLE")
+        .or_else(|_| std::env::var("ADAM_SITE_TITLE"))
         .or_else(|_| std::env::var("SITE_TITLE"))
-        .unwrap_or_else(|_| "RustDo".to_string());
+        .unwrap_or_else(|_| "Adam".to_string());
     let single_list = std::env::var("SINGLE_LIST")
         .map(|val| val == "true")
         .unwrap_or(false);
@@ -221,7 +221,7 @@ async fn main() {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    println!("RustDo server running at http://localhost:{}", port);
+    println!("Adam server running at http://localhost:{}", port);
 
     axum::serve(
         listener,

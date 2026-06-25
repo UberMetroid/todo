@@ -1,17 +1,17 @@
 services:
-  rustdo:
+  adam:
     build: .
-    image: ubermetroid/rustdo:latest
-    container_name: rustdo
+    image: ubermetroid/adam:latest
+    container_name: adam
     restart: unless-stopped
     ports:
       - ${PORT:-4403}:4403
     volumes:
-      - ${RUSTDO_DATA_PATH:-./data}:/app/data
+      - ${ADAM_DATA_PATH:-./data}:/app/data
     environment:
       PORT: 4403
-      SITE_TITLE: ${RUSTDO_SITE_TITLE:-RustDo}
-      RUSTDO_PIN: ${RUSTDO_PIN:-}
+      SITE_TITLE: ${ADAM_SITE_TITLE:-Adam}
+      ADAM_PIN: ${ADAM_PIN:-}
       BASE_URL: ${BASE_URL:-http://localhost:4403}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-*}
       TZ: ${TZ:-UTC}

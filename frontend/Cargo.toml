@@ -1,12 +1,12 @@
 [package]
 name = "frontend"
-version = "1.2.2"
+version = "2.0.0"
 edition = "2021"
 authors = ["UberMetroid <admin@ubermetroid.com>"]
 license = "Apache-2.0"
-repository = "https://github.com/UberMetroid/RustDo"
-homepage = "https://github.com/UberMetroid/RustDo"
-description = "Yew frontend application for RustDo."
+repository = "https://github.com/UberMetroid/Adam"
+homepage = "https://github.com/UberMetroid/Adam"
+description = "Yew frontend application for Adam."
 readme = "../README.md"
 
 [dependencies]

@@ -1,9 +1,9 @@
-// RustDo Yew Frontend Entrypoint
+// Adam Yew Frontend Entrypoint
 //
-// This is the main entry point for the RustDo web application.
+// This is the main entry point for the Adam web application.
 // It initializes and renders the main App component using Yew.
 //
-// Copyright (c) 2026 RustDo Authors. All rights reserved.
+// Copyright (c) 2026 Adam Authors. All rights reserved.
 
 mod api;
 mod app;
