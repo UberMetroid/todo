@@ -4,24 +4,26 @@ fn main() {
     // Clear screen
     print!("\x1B[2J\x1B[1;1H");
 
-    println!("\x1B[1;31m");
-    println!("       .·'  `'·.");
-    println!("    .-'  (O)(O)  '-.");
-    println!("   /   .-'  ''  '-.   \\");
-    println!("  |   /   .---.    \\   |");
-    println!("  |  |   /  _  \\    |  |");
-    println!("   \\  \\  | (_) |   /  /");
-    println!("    '-. \\ \\___/  .-'");
-    println!("       `'·.|||.·'");
+    println!("\x1B[1;33m");
+    println!("          _....._");
+    println!("       .-'       '-.");
+    println!("     .'  _     _   '.      \x1B[1;31m_");
+    println!("    \x1B[1;33m/   / \\   / \\    \\    \x1B[1;31m(_)");
+    println!("   \x1B[1;33m|   | (o) (o) |    |    \x1B[1;33m|");
+    println!("   |   |   | |   |    |    |");
+    println!("    \\   \\  \\_/  /    /    /");
+    println!("     '.  '-----'   .'  .-'");
+    println!("       \x1B[1;34m'-._______.-'-'  /");
+    println!("         /   |   \\    /");
+    println!("        /    |    \\  /");
+    println!("       /     |     \\/");
     println!("\x1B[0m");
 
-    println!("\x1B[1;32m=== UBERMETROID COMPANION SYSTEMS ===\x1B[0m");
-    println!("\x1B[1;33mTerminal Access Mode:\x1B[0m Restricted (Containerized Nix Shell)");
-    println!("\x1B[1;36mSuit Energy:\x1B[0m 99/99");
-    println!("\x1B[1;36mMissiles:\x1B[0m 255/255");
-    println!("\x1B[1;36mLocation:\x1B[0m Zebes Orbit / Docker Sandbox");
-    println!("\x1B[1;35mStatus:\x1B[0m Safe & Isolated");
-    println!("\nPress \x1B[1;37m[Enter]\x1B[0m to close console connection...");
+    println!("\x1B[1;32m=== UBERMETROID SECURITY CONSOLE ===\x1B[0m");
+    println!("\x1B[1;31mSystem Alert: Console Access is UNAUTHORIZED.\x1B[0m");
+    println!("This application is running inside a secure, read-only Nix container.");
+    println!("Direct shell access is disabled for environment isolation and security.");
+    println!("\nPress \x1B[1;37m[Enter]\x1B[0m to close connection...");
 
     let stdin = io::stdin();
     let mut buffer = String::new();
