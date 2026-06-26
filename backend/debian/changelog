@@ -1,7 +1,0 @@
-todo (2.1.1-1) stable; urgency=medium
-
-  * Initial Debian package release for Todo task tracker.
-  * Built with cargo-deb from Nix flake outputs.
-
- -- UberMetroid <admin@ubermetroid.com>  Fri, 26 Jun 2026 13:51:55 -1000
-

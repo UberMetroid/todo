@@ -24,24 +24,3 @@ sha2 = "0.11"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
-[package.metadata.deb]
-name = "todo"
-changelog = "debian/changelog"
-copyright = "2026 UberMetroid <admin@ubermetroid.com>"
-maintainer = "UberMetroid <admin@ubermetroid.com>"
-extended-description = """\
-Todo is a high-performance, self-hosted todo list application built in Rust. \
-It supports multiple lists, keyboard shortcuts, and optional PIN access."""
-depends = "$auto, libc6, ca-certificates"
-section = "utils"
-priority = "optional"
-maintainer-scripts = "debian"
-assets = [
-    ["target/release/backend", "usr/bin/todo", "755"],
-    ["../README.md", "usr/share/doc/todo/README.md", "644"],
-]
-systemd-units = {}
-
-[package.metadata.generate-rpm]
-name = "todo"
-
