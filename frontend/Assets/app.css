@@ -192,19 +192,7 @@
 @media (max-width: 640px) {
     .todo-form { flex-direction: column; }
     .todo-form .add-todo-btn { width: 100%; padding: 0.85rem; }
-    header {
-        flex-direction: column;
-        gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        margin-bottom: 1rem;
-    }
-    #header-title {
-        display: none;
-    }
-    .header-right {
-        width: 100%;
-        justify-content: center;
-    }
+
     footer.layout-footer {
         padding: 0.75rem 1rem;
         height: auto;
