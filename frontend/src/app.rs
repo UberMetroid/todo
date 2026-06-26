@@ -1,5 +1,6 @@
 use crate::storage::StorageService;
 use gloo_timers::callback::Timeout;
+use shared_assets::i18n::Language;
 use yew::prelude::*;
 
 use crate::api;
@@ -223,16 +224,25 @@ pub fn app() -> Html {
         .unwrap_or(false);
 
     html! {
-        <ContextProvider<i18n::I18nContext> context={locale}>
+        <ContextProvider<i18n::I18nContext> context={locale.clone()}>
             <Header
-                site_config={site_config_fallback}
+                site_title={site_config_fallback.site_title.clone()}
                 theme={(*theme).clone()}
-                on_toggle_theme={toggle_theme.clone()}
+                language={Language::from_code((*locale).to_str())}
+                toggle_theme={toggle_theme.clone()}
+                on_language_change={
+                    let locale = locale.clone();
+                    Callback::from(move |lang: Language| {
+                        locale.set(crate::i18n::Locale::from_str(lang.code()));
+                    })
+                }
                 is_authenticated={*authenticated}
-                is_pin_required={is_pin_required}
+                pin_required={is_pin_required}
                 on_logout={on_logout}
                 disable_print={disable_print}
                 enable_translation={enable_translation}
+                enable_themes={site_config_fallback.enable_themes}
+                enable_print={site_config_fallback.enable_print}
             />
             <div class="container">
                 if is_auth {
