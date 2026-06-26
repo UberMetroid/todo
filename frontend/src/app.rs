@@ -1,13 +1,10 @@
+pub mod view;
+
 use crate::storage::StorageService;
 use gloo_timers::callback::Timeout;
-use shared_assets::i18n::Language;
 use yew::prelude::*;
 
 use crate::api;
-use crate::header::Header;
-use crate::i18n;
-use crate::login::Login;
-use crate::todo_list::TodoList;
 use crate::types::ToastType;
 use shared::{PinRequiredResponse, SiteConfig, TodoLists};
 
@@ -37,13 +34,8 @@ pub fn app() -> Html {
     let (theme, toggle_theme) = crate::theme::use_theme();
     let locale = use_state(|| {
         let local_lang = StorageService::get_item("lang", "en");
-        i18n::Locale::from_str(&local_lang)
+        crate::i18n::Locale::from_str(&local_lang)
     });
-
-    let show_version = site_config.as_ref().map(|c| c.show_version).or_else(|| pin_required.as_ref().map(|p| p.show_version)).unwrap_or(true);
-    let show_github = site_config.as_ref().map(|c| c.show_github).or_else(|| pin_required.as_ref().map(|p| p.show_github)).unwrap_or(true);
-    let version = env!("CARGO_PKG_VERSION").to_string();
-    let version_url = format!("https://github.com/UberMetroid/todo/releases/tag/v{}", version);
 
     {
         let locale = locale.clone();
@@ -190,20 +182,6 @@ pub fn app() -> Html {
         }
     };
 
-    let is_auth = *authenticated
-        || pin_required
-            .as_ref()
-            .map(|pr| !pr.required)
-            .unwrap_or(false);
-    let site_config_fallback = site_config.as_ref().cloned().unwrap_or_else(|| SiteConfig {
-        site_title: "Todo".to_string(),
-        single_list: false,
-        enable_themes: true,
-        enable_print: false,
-        show_version: true,
-        show_github: true,
-    });
-    let is_pin_required = pin_required.as_ref().map(|pr| pr.required).unwrap_or(false);
     let on_logout = {
         let (authenticated, show_toast, todos) =
             (authenticated.clone(), show_toast.clone(), todos.clone());
@@ -222,70 +200,19 @@ pub fn app() -> Html {
         })
     };
 
-    let disable_print = todos
-        .as_ref()
-        .map(|t| t.values().all(|v| v.is_empty()))
-        .unwrap_or(true);
-
-    let enable_translation = pin_required
-        .as_ref()
-        .map(|p| p.enable_translation)
-        .unwrap_or(false);
-
-    html! {
-        <ContextProvider<i18n::I18nContext> context={locale.clone()}>
-            <Header
-                site_title={site_config_fallback.site_title.clone()}
-                theme={(*theme).clone()}
-                language={Language::from_code((*locale).to_str())}
-                toggle_theme={toggle_theme.clone()}
-                on_language_change={
-                    let locale = locale.clone();
-                    Callback::from(move |lang: Language| {
-                        locale.set(crate::i18n::Locale::from_str(lang.code()));
-                    })
-                }
-                is_authenticated={*authenticated}
-                pin_required={is_pin_required}
-                on_logout={on_logout}
-                disable_print={disable_print}
-                enable_translation={enable_translation}
-                enable_themes={site_config_fallback.enable_themes}
-                enable_print={site_config_fallback.enable_print}
-            />
-            <div class="container">
-                if is_auth {
-                    if let (Some(config), Some(_)) = (site_config.as_ref(), todos.as_ref()) {
-                        <TodoList
-                            site_config={config.clone()}
-                            todos={todos.clone()}
-                            current_list={current_list.clone()}
-                            theme={(*theme).clone()}
-                            on_toggle_theme={toggle_theme.clone()}
-                            show_toast={show_toast.clone()}
-                        />
-                    }
-                } else {
-                    if let Some(pr) = pin_required.as_ref() {
-                        <Login
-                            pin_required={pr.clone()}
-                            pin_error={(*pin_error).clone()}
-                            on_submit={verify_submit_pin}
-                            theme={(*theme).clone()}
-                            on_toggle_theme={toggle_theme}
-                        />
-                    }
-                }
-            </div>
-            <crate::footer::Footer {show_version} {version} {show_github} {version_url}>
-                {
-                    if let Some((msg, cls)) = &*active_notification {
-                        html! { <div class={format!("footer-status-text {}", cls)}>{ msg }</div> }
-                    } else {
-                        html! { <div class="footer-status-text success">{"Ready"}</div> }
-                    }
-                }
-            </crate::footer::Footer>
-        </ContextProvider<i18n::I18nContext>>
-    }
+    view::render_app(
+        locale,
+        (*theme).clone(),
+        toggle_theme,
+        (*site_config).clone(),
+        (*pin_required).clone(),
+        authenticated,
+        todos,
+        current_list,
+        (*active_notification).clone(),
+        (*pin_error).clone(),
+        Callback::from(verify_submit_pin),
+        on_logout,
+        show_toast,
+    )
 }
