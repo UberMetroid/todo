@@ -218,6 +218,7 @@ async fn main() {
         .fallback_service(
             ServeDir::new("frontend/dist").fallback(ServeFile::new("frontend/dist/index.html")),
         )
+        .layer(tower_http::trace::TraceLayer::new_for_http())
         .layer(cors)
         .layer(axum_middleware::from_fn(security_headers_middleware))
         .with_state(app_state.clone());
