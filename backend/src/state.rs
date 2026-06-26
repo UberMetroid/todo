@@ -16,6 +16,38 @@ pub struct AppState {
     pub enable_print: bool,
     // IP -> (failed_attempts, last_attempt_time)
     pub login_attempts: RwLock<HashMap<String, (usize, Instant)>>,
+    pub active_sessions: RwLock<std::collections::HashSet<String>>,
+    pub rate_limiter: RwLock<HashMap<String, Vec<Instant>>>,
+}
+
+impl AppState {
+    pub async fn check_rate_limit(&self, ip: &str) -> bool {
+        let max_requests = 100;
+        let window = std::time::Duration::from_secs(60);
+        let now = std::time::Instant::now();
+
+        let mut map = self.rate_limiter.write().await;
+        let timestamps = map.entry(ip.to_string()).or_insert_with(Vec::new);
+        
+        timestamps.retain(|&t| now.duration_since(t) < window);
+
+        if timestamps.len() >= max_requests {
+            false
+        } else {
+            timestamps.push(now);
+            true
+        }
+    }
+
+    pub async fn clean_old_rate_limits(&self) {
+        let window = std::time::Duration::from_secs(60);
+        let now = std::time::Instant::now();
+        let mut map = self.rate_limiter.write().await;
+        map.retain(|_, timestamps| {
+            timestamps.retain(|&t| now.duration_since(t) < window);
+            !timestamps.is_empty()
+        });
+    }
 }
 
 pub type SharedState = Arc<AppState>;

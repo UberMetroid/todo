@@ -1,16 +1,17 @@
 use axum::{
-    extract::State,
+    extract::{State, ConnectInfo},
     http::{HeaderMap, Request, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
     Json,
 };
 use axum_extra::extract::cookie::CookieJar;
+use std::net::SocketAddr;
 
 use crate::auth::secure_compare;
-use crate::state::{AppState, SharedState};
+use crate::state::{AppState, SharedState, get_client_ip};
 
-pub fn is_authenticated(state: &AppState, cookie_jar: &CookieJar, headers: &HeaderMap) -> bool {
+pub async fn is_authenticated(state: &AppState, cookie_jar: &CookieJar, headers: &HeaderMap) -> bool {
     let pin_env = match &state.pin {
         Some(p) => p,
         None => return true,
@@ -23,7 +24,7 @@ pub fn is_authenticated(state: &AppState, cookie_jar: &CookieJar, headers: &Head
     let header_pin = headers.get("x-pin").and_then(|h| h.to_str().ok());
 
     match (cookie_pin, header_pin) {
-        (Some(cookie), _) => secure_compare(cookie, &crate::auth::hash_pin(pin_env)),
+        (Some(cookie), _) => state.active_sessions.read().await.contains(cookie),
         (None, Some(hdr)) => secure_compare(hdr, pin_env),
         (None, None) => false,
     }
@@ -36,7 +37,7 @@ pub async fn auth_middleware(
     request: Request<axum::body::Body>,
     next: Next,
 ) -> Response {
-    if is_authenticated(&state, &cookie_jar, &headers) {
+    if is_authenticated(&state, &cookie_jar, &headers).await {
         next.run(request).await
     } else {
         (
@@ -45,6 +46,27 @@ pub async fn auth_middleware(
         )
             .into_response()
     }
+}
+
+pub async fn rate_limit_middleware(
+    State(state): State<SharedState>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    headers: HeaderMap,
+    request: Request<axum::body::Body>,
+    next: Next,
+) -> Response {
+    let ip = get_client_ip(&ConnectInfo(addr), &headers);
+
+    if !state.check_rate_limit(&ip).await {
+        let body = serde_json::json!({
+            "error": "Too many requests. Please slow down."
+        });
+        let mut response = axum::response::Json(body).into_response();
+        *response.status_mut() = StatusCode::TOO_MANY_REQUESTS;
+        return response;
+    }
+
+    next.run(request).await
 }
 
 pub async fn origin_validation_middleware(

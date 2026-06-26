@@ -14,6 +14,7 @@ pub fn secure_compare(a: &str, b: &str) -> bool {
     diff == 0
 }
 
+#[allow(dead_code)]
 pub fn hash_pin(pin: &str) -> String {
     use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
@@ -23,6 +24,24 @@ pub fn hash_pin(pin: &str) -> String {
         .iter()
         .map(|b| format!("{:02x}", b))
         .collect::<String>()
+}
+
+pub fn generate_session_id() -> String {
+    let mut bytes = [0u8; 16];
+    if let Ok(mut file) = File::open("/dev/urandom") {
+        let _ = file.read_exact(&mut bytes);
+        bytes.iter().map(|b| format!("{:02x}", b)).collect()
+    } else {
+        let random_val = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        use sha2::{Digest, Sha256};
+        let mut hasher = Sha256::new();
+        hasher.update(random_val.to_string().as_bytes());
+        let result = hasher.finalize();
+        result.iter().map(|b| format!("{:02x}", b)).collect()
+    }
 }
 
 // Generate random alphanumeric 9-character ID using /dev/urandom or LCG

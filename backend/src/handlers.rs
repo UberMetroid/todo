@@ -11,7 +11,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::auth::{hash_pin, secure_compare};
+use crate::auth::secure_compare;
 use crate::state::{get_client_ip, SharedState};
 use shared::{PinRequiredResponse, SiteConfig, VerifyPinRequest, VerifyPinResponse};
 
@@ -108,7 +108,7 @@ pub async fn verify_pin(
         }
     }
 
-    if payload.pin.len() < 4 || payload.pin.len() > 10 {
+    if payload.pin.len() < 4 || payload.pin.len() > 64 {
         let mut attempts = state.login_attempts.write().await;
         let entry = attempts.entry(client_ip).or_insert((0, Instant::now()));
         entry.0 = entry.0.saturating_add(1);
@@ -116,10 +116,10 @@ pub async fn verify_pin(
         let left = state.max_attempts.saturating_sub(entry.0);
 
         return (
-            StatusCode::UNAUTHORIZED,
+            StatusCode::BAD_REQUEST,
             Json(VerifyPinResponse {
                 valid: false,
-                error: Some("PIN must be between 4 and 10 digits".to_string()),
+                error: Some("PIN must be between 4 and 64 characters".to_string()),
                 attempts_left: Some(left),
                 locked: Some(left == 0),
                 lockout_minutes: Some(if left == 0 { 15 } else { 0 }),
@@ -143,13 +143,16 @@ pub async fn verify_pin(
     if valid {
         attempts.remove(&client_ip);
 
+        let session_id = crate::auth::generate_session_id();
+        state.active_sessions.write().await.insert(session_id.clone());
+
         let is_secure = headers
             .get("x-forwarded-proto")
             .and_then(|v| v.to_str().ok())
             .map(|v| v.eq_ignore_ascii_case("https"))
             .unwrap_or(false);
 
-        let cookie = Cookie::build(("TODO_PIN", hash_pin(&payload.pin)))
+        let cookie = Cookie::build(("TODO_PIN", session_id))
             .http_only(true)
             .secure(is_secure)
             .same_site(axum_extra::extract::cookie::SameSite::Strict)
@@ -234,7 +237,10 @@ pub async fn save_todos(State(state): State<SharedState>, Json(payload): Json<Va
     }
 }
 
-pub async fn logout(cookie_jar: CookieJar) -> impl IntoResponse {
+pub async fn logout(cookie_jar: CookieJar, State(state): State<SharedState>) -> impl IntoResponse {
+    if let Some(cookie) = cookie_jar.get("TODO_PIN") {
+        state.active_sessions.write().await.remove(cookie.value());
+    }
     let cookie = Cookie::build(("TODO_PIN", "")).path("/").build();
     (StatusCode::OK, cookie_jar.remove(cookie))
 }

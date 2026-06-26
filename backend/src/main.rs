@@ -20,7 +20,7 @@ mod tests;
 
 use auth::run_todo_migrations;
 use handlers::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
-use middleware::{auth_middleware, origin_validation_middleware, security_headers_middleware};
+use middleware::{auth_middleware, origin_validation_middleware, security_headers_middleware, rate_limit_middleware};
 use state::AppState;
 use static_files::{
     build_asset_manifest, serve_asset_manifest, serve_favicon, serve_favicon_png, serve_manifest,
@@ -98,7 +98,10 @@ async fn main() {
         .or_else(|_| std::env::var("ADAM_PIN"))
         .or_else(|_| std::env::var("PIN"))
         .ok()
-        .filter(|p| !p.trim().is_empty());
+        .filter(|p| {
+            let trimmed = p.trim();
+            trimmed.len() >= 4 && trimmed.len() <= 64
+        });
     let site_title = std::env::var("TODO_TITLE")
         .or_else(|_| std::env::var("TODO_SITE_TITLE"))
         .or_else(|_| std::env::var("ADAM_TITLE"))
@@ -159,14 +162,19 @@ async fn main() {
         enable_themes,
         enable_print,
         login_attempts: RwLock::new(HashMap::new()),
+        active_sessions: RwLock::new(std::collections::HashSet::new()),
+        rate_limiter: RwLock::new(HashMap::new()),
     });
 
     let clean_state = app_state.clone();
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(Duration::from_secs(60)).await;
-            let mut attempts = clean_state.login_attempts.write().await;
-            attempts.retain(|_, (_, last_time)| last_time.elapsed() < Duration::from_secs(15 * 60));
+            {
+                let mut attempts = clean_state.login_attempts.write().await;
+                attempts.retain(|_, (_, last_time)| last_time.elapsed() < Duration::from_secs(15 * 60));
+            }
+            clean_state.clean_old_rate_limits().await;
         }
     });
 
@@ -203,6 +211,10 @@ async fn main() {
         .route("/config", get(get_config))
         .route("/logout", post(logout))
         .merge(protected_routes)
+        .layer(axum_middleware::from_fn_with_state(
+            app_state.clone(),
+            rate_limit_middleware,
+        ))
         .layer(axum_middleware::from_fn_with_state(
             app_state.clone(),
             origin_validation_middleware,
