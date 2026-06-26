@@ -12,10 +12,12 @@ services:
       PORT: 4403
       SITE_TITLE: ${TODO_SITE_TITLE:-Todo}
       TODO_PIN: ${TODO_PIN:-}
-      BASE_URL: ${BASE_URL:-http://localhost:4403}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-*}
+      BASE_URL: ${TODO_BASE_URL:-http://localhost:4403}
+      ALLOWED_ORIGINS: ${TODO_ALLOWED_ORIGINS:-*}
       TZ: ${TZ:-UTC}
       SINGLE_LIST: ${SINGLE_LIST:-false}
       ENABLE_TRANSLATION: ${ENABLE_TRANSLATION:-false}
+      ENABLE_THEMES: ${ENABLE_THEMES:-true}
+      ENABLE_PRINT: ${ENABLE_PRINT:-true}
       MAX_ATTEMPTS: ${MAX_ATTEMPTS:-5}
 
