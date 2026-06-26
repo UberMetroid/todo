@@ -1,5 +1,6 @@
 :root, [data-theme="crateria"] {
     /* crateria - Dark Purple Theme */
+    --transition: 0.3s ease;
     --primary: #3b82f6;
     --primary-hover: #1d4ed8;
     --background: linear-gradient(135deg, #181524 0%, #120f1c 100%);
