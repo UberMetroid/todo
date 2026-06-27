@@ -10,8 +10,8 @@ description = "Axum backend service for Todo."
 readme = "../README.md"
 
 [dependencies]
-shared-assets = { path = "../frontend/Assets/shared-assets/shared-rust" }
-shared = { path = "../shared" }
+shared-assets = { path = "../frontend/Assets/shared-assets/shared-rust", version = "3.0.0" }
+shared = { path = "../shared", version = "2.1.1" }
 axum = { version = "0.8", features = ["macros"] }
 tokio = { version = "1", features = ["full"] }
 tower-http = { version = "0.6", features = ["fs", "cors", "trace"] }

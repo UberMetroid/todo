@@ -10,8 +10,8 @@ description = "Yew frontend application for Todo."
 readme = "../README.md"
 
 [dependencies]
-shared = { path = "../shared" }
-shared-assets = { path = "Assets/shared-assets/shared-rust" }
+shared = { path = "../shared", version = "2.1.1" }
+shared-assets = { path = "Assets/shared-assets/shared-rust", version = "3.0.0" }
 yew = { version = "0.23", features = ["csr"] }
 wasm-bindgen = "=0.2.121"
 wasm-bindgen-futures = "=0.4.71"
