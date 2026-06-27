@@ -524,7 +524,7 @@ mod tests {
         let state = test_state();
         let connect_info = ConnectInfo(SocketAddr::from(([10, 0, 0, 102], 12345)));
         let headers = HeaderMap::new();
-        let jar = CookieJar::new();
+        let mut jar = CookieJar::new();
         let _ = verify_pin(
             State(state.clone()),
             connect_info,
@@ -533,10 +533,26 @@ mod tests {
             Json(VerifyPinRequest { pin: "1234".into() }),
         )
         .await;
+        // Capture the session id that verify_pin just minted so we can
+        // put it on the jar that logout will read. (In production,
+        // the Set-Cookie header from the response is what the browser
+        // would persist; the test bypasses the HTTP plumbing.)
+        let session_id = state
+            .active_sessions
+            .read()
+            .await
+            .iter()
+            .next()
+            .cloned()
+            .expect("verify_pin should have inserted a session");
+        jar = jar.add(
+            axum_extra::extract::cookie::Cookie::build(("TODO_PIN", session_id))
+                .path("/")
+                .http_only(true)
+                .build(),
+        );
         // Now logout.
-        let _ = logout(jar.clone(), State(state.clone())).await;
-        // No direct way to assert from here, but the active_sessions
-        // set should now be empty.
+        let _ = logout(jar, State(state.clone())).await;
         assert!(state.active_sessions.read().await.is_empty());
     }
 }
