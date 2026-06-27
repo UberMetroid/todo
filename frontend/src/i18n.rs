@@ -21,6 +21,7 @@ pub enum Locale {
     Ru,
 }
 
+#[allow(dead_code)]
 impl Locale {
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
@@ -48,6 +49,7 @@ impl Locale {
         }
     }
 
+    #[allow(dead_code)]
     pub fn all() -> &'static [Self] {
         &[
             Self::En,

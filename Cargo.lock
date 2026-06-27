@@ -115,7 +115,9 @@ version = "2.2.0"
 dependencies = [
  "axum",
  "axum-extra",
+ "constant_time_eq",
  "dotenvy",
+ "ipnet",
  "serde",
  "serde_json",
  "sha2",
@@ -1179,6 +1181,7 @@ name = "shared"
 version = "2.1.1"
 dependencies = [
  "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -47,13 +47,7 @@ impl TodoState {
         }
         // Fall back to the legacy raw map and migrate.
         let lists: shared::TodoLists = serde_json::from_str(content)?;
-        Ok((
-            Self {
-                version: 1,
-                lists,
-            },
-            true,
-        ))
+        Ok((Self { version: 1, lists }, true))
     }
 }
 
@@ -73,10 +67,7 @@ mod tests {
                 completed: false,
             }],
         );
-        let state = TodoState {
-            version: 5,
-            lists,
-        };
+        let state = TodoState { version: 5, lists };
         let json = serde_json::to_string(&state).unwrap();
         let back: TodoState = serde_json::from_str(&json).unwrap();
         assert_eq!(state, back);

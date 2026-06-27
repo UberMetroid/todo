@@ -7,8 +7,8 @@
 
 mod api;
 mod app;
-mod header;
 mod footer;
+mod header;
 mod i18n;
 mod login;
 mod storage;

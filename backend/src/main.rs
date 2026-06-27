@@ -20,9 +20,9 @@ mod handlers;
 mod middleware;
 mod state;
 mod static_files;
-mod types;
 #[cfg(test)]
 mod tests;
+mod types;
 
 use auth::run_todo_migrations;
 use handlers::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
@@ -99,8 +99,8 @@ async fn main() {
 
     let port = server_config.port;
     let allowed_origins = server_config.allowed_origins.clone();
-    let is_production = std::env::var("NODE_ENV").unwrap_or_else(|_| "production".to_string())
-        == "production";
+    let is_production =
+        std::env::var("NODE_ENV").unwrap_or_else(|_| "production".to_string()) == "production";
 
     let data_dir = "data";
     let data_file = format!("{data_dir}/todos.json");
@@ -199,9 +199,15 @@ async fn main() {
         // security headers from shared-assets (X-Frame-Options, CSP, etc.)
         .layer(axum_middleware::from_fn(security_headers_middleware))
         // HSTS only when HTTPS is in use
-        .layer(axum_middleware::from_fn_with_state(hsts_state, shared_assets::middleware::hsts_layer))
+        .layer(axum_middleware::from_fn_with_state(
+            hsts_state,
+            shared_assets::middleware::hsts_layer,
+        ))
         // title injection (replaces {{SITE_TITLE}} in HTML)
-        .layer(axum_middleware::from_fn_with_state(title_state, shared_assets::middleware::title_injection_layer))
+        .layer(axum_middleware::from_fn_with_state(
+            title_state,
+            shared_assets::middleware::title_injection_layer,
+        ))
         // CORS last so it can short-circuit OPTIONS preflights
         .layer(cors)
         .with_state(app_state.clone());

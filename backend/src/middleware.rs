@@ -155,7 +155,10 @@ mod tests {
 
     #[test]
     fn extract_origin_strips_path() {
-        assert_eq!(extract_origin("https://example.com/"), "https://example.com");
+        assert_eq!(
+            extract_origin("https://example.com/"),
+            "https://example.com"
+        );
         assert_eq!(
             extract_origin("https://example.com/path?q=1"),
             "https://example.com"

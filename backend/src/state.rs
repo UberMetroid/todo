@@ -11,7 +11,9 @@ use axum::http::HeaderMap;
 use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::Instant};
 use tokio::sync::RwLock;
 
-#[derive(Clone)]
+// `AppState` holds non-`Clone` fields (tokio RwLocks) and is always
+// accessed through `Arc<AppState>` (see `SharedState` below). Don't
+// add `#[derive(Clone)]` — wrap in `Arc` and clone the Arc instead.
 pub struct AppState {
     /// Server-wide PIN, if configured. When `None`, the app is in public
     /// mode and `auth_middleware` short-circuits to allow.

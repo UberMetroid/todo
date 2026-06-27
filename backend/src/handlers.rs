@@ -12,17 +12,12 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
-use std::{
-    net::SocketAddr,
-    time::{Duration, Instant},
-};
+use std::{net::SocketAddr, time::Duration};
 
 use crate::auth::{build_session_cookie_header, secure_compare};
 use crate::state::{SharedState, get_client_ip};
 use crate::types::TodoState;
-use shared::{
-    PinRequiredResponse, SiteConfig, VerifyPinRequest, VerifyPinResponse,
-};
+use shared::{PinRequiredResponse, SiteConfig, VerifyPinRequest, VerifyPinResponse};
 
 /// Length bounds for a user-supplied PIN, matching shared-assets's
 /// `ServerConfig::from_env` policy.
@@ -32,6 +27,8 @@ const PIN_MAX_LEN: usize = 64;
 /// Default lockout window when the request does not yet have one pinned
 /// to a specific IP (used only in unit tests; production always supplies
 /// a duration).
+#[cfg(test)]
+#[allow(dead_code)]
 const DEFAULT_LOCKOUT: Duration = Duration::from_secs(15 * 60);
 
 pub async fn get_pin_required(
@@ -47,9 +44,13 @@ pub async fn get_pin_required(
     );
     let max_attempts = state.max_attempts as u32;
 
-    let locked = shared_assets::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration);
-    let remaining_secs = shared_assets::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
-    let attempts_left = shared_assets::auth::attempts_left(&client_ip, max_attempts, state.lockout_duration);
+    let locked =
+        shared_assets::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration);
+    let remaining_secs =
+        shared_assets::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
+    let attempts_left =
+        shared_assets::auth::attempts_left(&client_ip, max_attempts, state.lockout_duration)
+            as usize;
 
     let lockout_minutes = if locked {
         remaining_secs.div_ceil(60)
@@ -104,7 +105,8 @@ pub async fn verify_pin(
 
     // 1. Lockout check — return 429 without inspecting the PIN.
     if shared_assets::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration) {
-        let remaining = shared_assets::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
+        let remaining =
+            shared_assets::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
         let minutes = remaining.div_ceil(60);
         return (
             StatusCode::TOO_MANY_REQUESTS,
@@ -172,11 +174,8 @@ pub async fn verify_pin(
             .map(|v| v.eq_ignore_ascii_case("https"))
             .unwrap_or(false);
 
-        let cookie_value = build_session_cookie_header(
-            &session_id,
-            state.cookie_max_age_hours,
-            is_secure,
-        );
+        let cookie_value =
+            build_session_cookie_header(&session_id, state.cookie_max_age_hours, is_secure);
         let cookie = Cookie::build(("TODO_PIN", session_id))
             .http_only(true)
             .secure(is_secure)
@@ -248,7 +247,10 @@ pub async fn get_todos(State(state): State<SharedState>) -> Response {
         let content = std::fs::read_to_string(&data_file)?;
         let (todo_state, needs_rewrite) = TodoState::parse_with_migration(&content)
             .map_err(|e| format!("data file is corrupt: {e}"))?;
-        Ok::<(TodoState, bool), Box<dyn std::error::Error + Send + Sync>>((todo_state, needs_rewrite))
+        Ok::<(TodoState, bool), Box<dyn std::error::Error + Send + Sync>>((
+            todo_state,
+            needs_rewrite,
+        ))
     })
     .await;
 
@@ -313,6 +315,9 @@ pub async fn save_todos(
         version: current_version + 1,
         lists: payload.lists,
     };
+    // Capture the new version *before* moving `new_state` into the
+    // blocking write below — we need it for the response.
+    let new_version = new_state.version;
 
     // 4. Write atomically: backup current → write to .tmp → rename.
     //    On failure, leave the original file untouched.
@@ -339,7 +344,7 @@ pub async fn save_todos(
     match write_res {
         Ok(Ok(())) => Json(serde_json::json!({
             "success": true,
-            "version": new_state.version,
+            "version": new_version,
         }))
         .into_response(),
         Ok(Err(e)) => (
@@ -387,7 +392,7 @@ mod tests {
             data_file: "test_todos.json".into(),
             asset_manifest: vec![],
             max_attempts: 5,
-            lockout_duration: DEFAULT_LOCKOUT,
+            lockout_duration: std::time::Duration::from_secs(15 * 60),
             enable_translation: false,
             enable_themes: false,
             enable_print: false,
@@ -419,17 +424,8 @@ mod tests {
         let connect_info = ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 12345)));
         let headers = HeaderMap::new();
         let jar = CookieJar::new();
-        let req = VerifyPinRequest {
-            pin: "1234".into(),
-        };
-        let res = verify_pin(
-            State(state.clone()),
-            connect_info,
-            headers,
-            jar,
-            Json(req),
-        )
-        .await;
+        let req = VerifyPinRequest { pin: "1234".into() };
+        let res = verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
         assert_eq!(res.status(), StatusCode::OK);
     }
 
@@ -439,17 +435,8 @@ mod tests {
         let connect_info = ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 12345)));
         let headers = HeaderMap::new();
         let jar = CookieJar::new();
-        let req = VerifyPinRequest {
-            pin: "5678".into(),
-        };
-        let res = verify_pin(
-            State(state.clone()),
-            connect_info,
-            headers,
-            jar,
-            Json(req),
-        )
-        .await;
+        let req = VerifyPinRequest { pin: "5678".into() };
+        let res = verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
         assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
     }
 
@@ -460,17 +447,8 @@ mod tests {
         let connect_info = ConnectInfo(SocketAddr::from(([10, 0, 0, 99], 12345)));
         let headers = HeaderMap::new();
         let jar = CookieJar::new();
-        let req = VerifyPinRequest {
-            pin: "1".into(),
-        };
-        let res = verify_pin(
-            State(state.clone()),
-            connect_info,
-            headers,
-            jar,
-            Json(req),
-        )
-        .await;
+        let req = VerifyPinRequest { pin: "1".into() };
+        let res = verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
         // Counter should still be 0 for this IP — no failed attempts
@@ -489,17 +467,8 @@ mod tests {
         let connect_info = ConnectInfo(SocketAddr::from(([10, 0, 0, 100], 12345)));
         let headers = HeaderMap::new();
         let jar = CookieJar::new();
-        let req = VerifyPinRequest {
-            pin: "5678".into(),
-        };
-        let res = verify_pin(
-            State(state.clone()),
-            connect_info,
-            headers,
-            jar,
-            Json(req),
-        )
-        .await;
+        let req = VerifyPinRequest { pin: "5678".into() };
+        let res = verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
         assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
         let left = shared_assets::auth::attempts_left(
             "10.0.0.100",

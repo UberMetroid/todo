@@ -167,7 +167,8 @@ mod tests {
 
     #[test]
     fn site_config_defaults_show_flags_true() {
-        let json = r#"{"siteTitle":"x","singleList":false,"enableThemes":false,"enablePrint":false}"#;
+        let json =
+            r#"{"siteTitle":"x","singleList":false,"enableThemes":false,"enablePrint":false}"#;
         let cfg: SiteConfig = serde_json::from_str(json).unwrap();
         assert!(cfg.show_version);
         assert!(cfg.show_github);

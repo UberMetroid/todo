@@ -89,16 +89,10 @@ pub fn generate_random_id() -> String {
 /// - `Secure` — only sent over HTTPS, when the request is HTTPS
 /// - `Max-Age` — from `ServerConfig::cookie_max_age_hours`
 /// - `Path=/` — sent on every route
-pub fn build_session_cookie_header(
-    value: &str,
-    max_age_hours: i64,
-    is_secure: bool,
-) -> String {
+pub fn build_session_cookie_header(value: &str, max_age_hours: i64, is_secure: bool) -> String {
     let max_age = max_age_hours * 3600;
     let secure_flag = if is_secure { "; Secure" } else { "" };
-    format!(
-        "TODO_PIN={value}; Path=/; HttpOnly; SameSite=Strict; Max-Age={max_age}{secure_flag}"
-    )
+    format!("TODO_PIN={value}; Path=/; HttpOnly; SameSite=Strict; Max-Age={max_age}{secure_flag}")
 }
 
 /// Migrate any task items that lack an `id` field. Writes back in-place

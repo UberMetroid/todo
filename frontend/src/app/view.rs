@@ -2,10 +2,11 @@ use crate::header::Header;
 use crate::login::Login;
 use crate::todo_list::TodoList;
 use crate::types::ToastType;
+use shared::{PinRequiredResponse, SiteConfig, TodoLists};
 use shared_assets::i18n::Language;
 use yew::prelude::*;
-use shared::{PinRequiredResponse, SiteConfig, TodoLists};
 
+#[allow(clippy::too_many_arguments)]
 pub fn render_app(
     locale: UseStateHandle<crate::i18n::Locale>,
     theme: String,
@@ -21,10 +22,21 @@ pub fn render_app(
     on_logout: Callback<web_sys::MouseEvent>,
     show_toast: Callback<(String, ToastType)>,
 ) -> Html {
-    let show_version = site_config.as_ref().map(|c| c.show_version).or_else(|| pin_required.as_ref().map(|p| p.show_version)).unwrap_or(true);
-    let show_github = site_config.as_ref().map(|c| c.show_github).or_else(|| pin_required.as_ref().map(|p| p.show_github)).unwrap_or(true);
+    let show_version = site_config
+        .as_ref()
+        .map(|c| c.show_version)
+        .or_else(|| pin_required.as_ref().map(|p| p.show_version))
+        .unwrap_or(true);
+    let show_github = site_config
+        .as_ref()
+        .map(|c| c.show_github)
+        .or_else(|| pin_required.as_ref().map(|p| p.show_github))
+        .unwrap_or(true);
     let version = env!("CARGO_PKG_VERSION").to_string();
-    let version_url = format!("https://github.com/UberMetroid/todo/releases/tag/v{}", version);
+    let version_url = format!(
+        "https://github.com/UberMetroid/todo/releases/tag/v{}",
+        version
+    );
 
     let is_auth = *authenticated
         || pin_required
@@ -40,7 +52,7 @@ pub fn render_app(
         show_version: true,
         show_github: true,
     });
-    
+
     let is_pin_required = pin_required.as_ref().map(|pr| pr.required).unwrap_or(false);
 
     let disable_print = todos
