@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     shared-assets = {
-      url = "github:UberMetroid/shared-assets/v3.0.0";
+      url = "github:UberMetroid/shared-assets?ref=v3.0.1";
       flake = false;
     };
   };
@@ -16,6 +16,7 @@
       let
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
+        lib = pkgs.lib;
         rustVersion = pkgs.rust-bin.stable."1.96.0".default.override {
           targets = [ "wasm32-unknown-unknown" ];
         };
@@ -32,6 +33,11 @@
 
           cargoLock = {
             lockFile = ./Cargo.lock;
+            outputHashes = {
+              "shared-core-3.0.0" = "sha256-vx5KA82qzowEF6+Qt2tFT4g54y90tcbXmCzhSXecYiI=";
+              "shared-backend-3.0.0" = "sha256-vx5KA82qzowEF6+Qt2tFT4g54y90tcbXmCzhSXecYiI=";
+              "shared-frontend-3.0.0" = "sha256-vx5KA82qzowEF6+Qt2tFT4g54y90tcbXmCzhSXecYiI=";
+            };
           };
 
           nativeBuildInputs = [
@@ -62,6 +68,11 @@
 
           cargoLock = {
             lockFile = ./Cargo.lock;
+            outputHashes = {
+              "shared-core-3.0.0" = "sha256-vx5KA82qzowEF6+Qt2tFT4g54y90tcbXmCzhSXecYiI=";
+              "shared-backend-3.0.0" = "sha256-vx5KA82qzowEF6+Qt2tFT4g54y90tcbXmCzhSXecYiI=";
+              "shared-frontend-3.0.0" = "sha256-vx5KA82qzowEF6+Qt2tFT4g54y90tcbXmCzhSXecYiI=";
+            };
           };
 
           nativeBuildInputs = [ pkgs.pkg-config ];
