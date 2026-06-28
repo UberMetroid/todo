@@ -60,6 +60,7 @@ pub fn render_app(
         .map(|t| t.values().all(|v| v.is_empty()))
         .unwrap_or(true);
 
+    let enable_print = pin_required.as_ref().map(|p| p.enable_print).unwrap_or(false);
     let enable_translation = pin_required
         .as_ref()
         .map(|p| p.enable_translation)
@@ -84,6 +85,7 @@ pub fn render_app(
                 print_disabled={disable_print}
                 enable_translation={enable_translation}
                 enable_themes={site_config_fallback.enable_themes}
+                enable_print={enable_print}
                 on_print={None}
             />
             <div class="container">
