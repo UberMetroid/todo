@@ -5,10 +5,22 @@ use crate::types::ToastType;
 use shared::PinRequiredResponse;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+use shared_assets::theme::{Theme, mapping::Scheme};
 
 impl App {
     pub fn create_app(ctx: &Context<Self>) -> Self {
-        let theme = StorageService::get_item("theme", "crateria");
+        let raw = StorageService::get_item("theme", Theme::default().name());
+        let theme = if let Some(scheme) = Scheme::from_id(&raw) {
+            scheme.to_theme().name().to_string()
+        } else {
+            Theme::from_name(&raw)
+                .unwrap_or_default()
+                .name()
+                .to_string()
+        };
+        if theme != raw {
+            StorageService::set_item("theme", &theme);
+        }
         
         if let Some(win) = web_sys::window()
             && let Some(doc) = win.document()
@@ -17,6 +29,7 @@ impl App {
             let _ = el.set_attribute("data-theme", &theme);
             let _ = el.set_attribute("class", &theme);
         }
+
 
         let local_lang = StorageService::get_item("lang", "en");
         let locale = crate::i18n::Locale::from_str(&local_lang);
@@ -145,25 +158,27 @@ impl App {
                 true
             }
             Msg::ToggleTheme => {
-                let next = match self.theme.as_str() {
-                    "crateria" => "brinstar",
-                    "brinstar" => "norfair",
-                    "norfair" => "wrecked_ship",
-                    "wrecked_ship" => "maridia",
-                    "maridia" => "tourian",
-                    _ => "crateria",
+                let current = Theme::from_name(&self.theme).unwrap_or_default();
+                let next = match current {
+                    Theme::Brinstar => Theme::Norfair,
+                    Theme::Norfair => Theme::WreckedShip,
+                    Theme::WreckedShip => Theme::Maridia,
+                    Theme::Maridia => Theme::Tourian,
+                    Theme::Tourian => Theme::Crateria,
+                    Theme::Crateria => Theme::Brinstar,
                 };
-                StorageService::set_item("theme", next);
+                StorageService::set_item("theme", next.name());
                 if let Some(html) = web_sys::window()
                     .and_then(|w| w.document())
                     .and_then(|d| d.document_element())
                 {
-                    let _ = html.set_attribute("data-theme", next);
-                    let _ = html.set_attribute("class", next);
+                    let _ = html.set_attribute("data-theme", next.name());
+                    let _ = html.set_attribute("class", next.name());
                 }
-                self.theme = next.to_string();
+                self.theme = next.name().to_string();
                 true
             }
+
             Msg::Logout => {
                 let link = ctx.link().clone();
                 spawn_local(async move {
