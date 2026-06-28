@@ -1,7 +1,7 @@
 # Todo - Blazing Fast Todo List
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/UberMetroid/todo/main/frontend/Assets/favicon.png" alt="Todo Logo" width="128" height="128">
+  <img src="https://raw.githubusercontent.com/UberMetroid/todo/main/frontend/Assets/favicon.png?v=3.0.1" alt="Todo Logo" width="128" height="128">
 </p>
 
 Todo is a blazing fast, single-purpose todo list application written in 100% Rust. Built with a high-performance Rust (Axum/Tokio) backend and a WebAssembly (Yew) frontend.
