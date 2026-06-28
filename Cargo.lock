@@ -279,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "frontend"
-version = "2.1.1"
+version = "3.0.1"
 dependencies = [
  "gloo-net 0.7.0",
  "gloo-storage 0.4.0",
@@ -1179,7 +1179,7 @@ dependencies = [
 [[package]]
 name = "shared-backend"
 version = "3.0.0"
-source = "git+https://github.com/UberMetroid/shared-assets?tag=v3.0.0#bb7a642f249bf91bcdf1f6aee7783508446958ee"
+source = "git+https://github.com/UberMetroid/shared-assets?tag=v3.0.1#bb7a642f249bf91bcdf1f6aee7783508446958ee"
 dependencies = [
  "anyhow",
  "axum",
@@ -1198,7 +1198,7 @@ dependencies = [
 [[package]]
 name = "shared-core"
 version = "3.0.0"
-source = "git+https://github.com/UberMetroid/shared-assets?tag=v3.0.0#bb7a642f249bf91bcdf1f6aee7783508446958ee"
+source = "git+https://github.com/UberMetroid/shared-assets?tag=v3.0.1#bb7a642f249bf91bcdf1f6aee7783508446958ee"
 dependencies = [
  "constant_time_eq",
  "serde",
@@ -1207,7 +1207,7 @@ dependencies = [
 [[package]]
 name = "shared-frontend"
 version = "3.0.0"
-source = "git+https://github.com/UberMetroid/shared-assets?tag=v3.0.0#bb7a642f249bf91bcdf1f6aee7783508446958ee"
+source = "git+https://github.com/UberMetroid/shared-assets?tag=v3.0.1#bb7a642f249bf91bcdf1f6aee7783508446958ee"
 dependencies = [
  "serde",
  "shared-core",
