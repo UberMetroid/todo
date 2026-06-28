@@ -2,7 +2,7 @@ pub mod auth;
 pub mod config;
 pub mod todos;
 
-pub use auth::{get_pin_required, verify_pin, logout};
+pub use auth::{get_pin_required, logout, verify_pin};
 pub use config::get_config;
 pub use todos::{get_todos, save_todos};
 
@@ -12,18 +12,18 @@ pub const PIN_MAX_LEN: usize = 64;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::state::SharedState;
     use axum::{
         Json,
         extract::{ConnectInfo, State},
         http::{HeaderMap, StatusCode},
     };
     use axum_extra::extract::cookie::CookieJar;
+    use shared::VerifyPinRequest;
     use std::collections::HashMap;
     use std::net::SocketAddr;
     use std::sync::Arc;
     use tokio::sync::RwLock;
-    use crate::state::SharedState;
-    use shared::VerifyPinRequest;
 
     fn test_state() -> SharedState {
         Arc::new(crate::state::AppState {

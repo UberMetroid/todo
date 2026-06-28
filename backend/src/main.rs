@@ -16,8 +16,8 @@ use tokio::sync::RwLock;
 use tower_http::services::{ServeDir, ServeFile};
 
 mod auth;
-mod routes;
 mod middleware;
+mod routes;
 mod state;
 mod static_files;
 #[cfg(test)]
@@ -25,11 +25,11 @@ mod tests;
 mod types;
 
 use auth::run_todo_migrations;
-use routes::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
 use middleware::{
     auth_middleware, origin_validation_middleware, rate_limit_middleware,
     security_headers_middleware,
 };
+use routes::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
 use state::AppState;
 use static_files::{
     build_asset_manifest, serve_asset_manifest, serve_favicon, serve_favicon_png, serve_health,

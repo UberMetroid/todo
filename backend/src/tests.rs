@@ -126,7 +126,7 @@ fn random_ids_are_unique() {
 #[tokio::test]
 async fn get_config_returns_state_values() {
     let state = test_state();
-    let config: SiteConfig = handlers::get_config(State(state)).await.0;
+    let config: SiteConfig = routes::get_config(State(state)).await.0;
     assert_eq!(config.site_title, "TestDo");
     assert!(!config.single_list);
     assert!(config.show_version);
@@ -138,7 +138,7 @@ async fn get_pin_required_reports_correct_values() {
     let state = test_state();
     let connect_info = ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 12345)));
     let headers = HeaderMap::new();
-    let res: PinRequiredResponse = handlers::get_pin_required(State(state), connect_info, headers)
+    let res: PinRequiredResponse = routes::get_pin_required(State(state), connect_info, headers)
         .await
         .0;
     assert!(res.required);
@@ -156,7 +156,7 @@ async fn verify_pin_correct_returns_ok() {
     let req = VerifyPinRequest {
         pin: "12345678".into(),
     };
-    let res = handlers::verify_pin(State(state), connect_info, headers, jar, Json(req)).await;
+    let res = routes::verify_pin(State(state), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::OK);
 }
 
@@ -169,7 +169,7 @@ async fn verify_pin_wrong_returns_401() {
     let req = VerifyPinRequest {
         pin: "87654321".into(),
     };
-    let res = handlers::verify_pin(State(state), connect_info, headers, jar, Json(req)).await;
+    let res = routes::verify_pin(State(state), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
 }
 
@@ -180,8 +180,7 @@ async fn verify_pin_short_returns_400_without_incrementing() {
     let headers = HeaderMap::new();
     let jar = CookieJar::new();
     let req = VerifyPinRequest { pin: "1".into() };
-    let res =
-        handlers::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
+    let res = routes::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
     // Counter for this IP must remain at 0 — format errors are not
@@ -204,7 +203,7 @@ async fn verify_pin_lockout_after_max_attempts() {
         let req = VerifyPinRequest {
             pin: format!("wrong{i}"),
         };
-        let _ = handlers::verify_pin(
+        let _ = routes::verify_pin(
             State(state.clone()),
             connect_info,
             headers.clone(),
@@ -218,8 +217,7 @@ async fn verify_pin_lockout_after_max_attempts() {
     let req = VerifyPinRequest {
         pin: "12345678".into(),
     };
-    let res =
-        handlers::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
+    let res = routes::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::TOO_MANY_REQUESTS);
 }
 

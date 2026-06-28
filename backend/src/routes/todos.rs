@@ -1,11 +1,11 @@
+use crate::state::SharedState;
+use crate::types::TodoState;
 use axum::{
     Json,
     extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use crate::state::SharedState;
-use crate::types::TodoState;
 
 /// Read the todos file. Returns the envelope form `{ version, lists }`.
 /// Migrates legacy plain-map format transparently and rewrites the file

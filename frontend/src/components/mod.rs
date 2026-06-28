@@ -1,9 +1,9 @@
-pub mod pin;
-pub mod todo_list;
-pub mod todo_item;
-pub mod todo_form;
-pub mod todo_items_list;
-pub mod todo_list_handlers;
-pub mod toast;
-pub mod header;
 pub mod footer;
+pub mod header;
+pub mod pin;
+pub mod toast;
+pub mod todo_form;
+pub mod todo_item;
+pub mod todo_items_list;
+pub mod todo_list;
+pub mod todo_list_handlers;

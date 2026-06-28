@@ -8,10 +8,10 @@ use axum_extra::extract::cookie::{Cookie, CookieJar};
 use std::net::SocketAddr;
 use std::time::Duration;
 
+use super::{PIN_MAX_LEN, PIN_MIN_LEN};
 use crate::auth::{build_session_cookie_header, secure_compare};
 use crate::state::{SharedState, get_client_ip};
 use shared::{PinRequiredResponse, VerifyPinRequest, VerifyPinResponse};
-use super::{PIN_MIN_LEN, PIN_MAX_LEN};
 
 pub async fn get_pin_required(
     State(state): State<SharedState>,

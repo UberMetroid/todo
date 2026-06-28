@@ -7,6 +7,7 @@ pub enum ToastType {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct Toast {
     pub id: usize,
     pub message: String,

@@ -1,6 +1,6 @@
 use crate::storage::StorageService;
-use yew::prelude::*;
 use shared_assets::theme::{Theme, mapping::Scheme};
+use yew::prelude::*;
 
 #[hook]
 pub fn use_theme() -> (UseStateHandle<String>, Callback<MouseEvent>) {
@@ -47,4 +47,3 @@ pub fn use_theme() -> (UseStateHandle<String>, Callback<MouseEvent>) {
 
     (theme, toggle_theme)
 }
-
