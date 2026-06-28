@@ -14,7 +14,7 @@ shared-assets = { package = "shared-backend", path = "../frontend/Assets/shared-
 shared = { path = "../shared", version = "2.1.1" }
 axum = { version = "0.8", features = ["macros"] }
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.6", features = ["fs", "cors", "trace"] }
+tower-http = { version = "0.7", features = ["fs", "cors", "trace"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tower = "0.5"
