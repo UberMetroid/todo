@@ -3,7 +3,7 @@
 //! `AppState` holds all per-instance state — environment-derived
 //! configuration, in-memory rate-limit data, and the active-session
 //! set. PIN-attempt tracking lives **process-globally** inside
-//! `shared_assets::auth::attempts` so that lockouts survive handler
+//! `shared_backend::auth::attempts` so that lockouts survive handler
 //! re-creations (axum builds handlers per request); see
 //! [`crate::handlers`] for the call sites.
 
@@ -89,7 +89,7 @@ pub type SharedState = Arc<AppState>;
 
 /// Resolve the client IP from the connecting socket and request headers.
 ///
-/// Behaviour matches `shared_assets::server::ip::get_client_ip`:
+/// Behaviour matches `shared_backend::server::ip::get_client_ip`:
 ///
 /// 1. If `trust_proxy` is `false` (the safe default), the connecting
 ///    socket IP is used unconditionally.
@@ -106,7 +106,7 @@ pub fn get_client_ip(
     trust_proxy: bool,
     trusted_proxies: &[ipnet::IpNet],
 ) -> String {
-    shared_assets::server::get_client_ip(headers, socket_addr, trust_proxy, trusted_proxies)
+    shared_backend::server::get_client_ip(headers, socket_addr, trust_proxy, trusted_proxies)
 }
 
 #[cfg(test)]

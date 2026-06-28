@@ -1,5 +1,5 @@
 use crate::storage::StorageService;
-use shared_assets::theme::{Theme, mapping::Scheme};
+use shared_frontend::theme::{Theme, mapping::Scheme};
 use yew::prelude::*;
 
 #[hook]

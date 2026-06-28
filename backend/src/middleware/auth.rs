@@ -1,7 +1,7 @@
 //! PIN-related helpers for the `todo` backend.
 //!
 //! The PIN verification, lockout, and rate-limit logic is delegated to
-//! `shared_assets::auth::attempts` and `shared_assets::server::ip` so that
+//! `shared_backend::auth::attempts` and `shared_backend::server::ip` so that
 //! every UberMetroid companion app uses the same primitives.
 //!
 //! This module retains only the **todo-specific** helpers:
@@ -12,9 +12,9 @@
 //! - Random 9-char task ID generation.
 //! - File-format migrations for `data/todos.json`.
 //! - A `TODO_PIN`-named cookie helper that uses the same security
-//!   attributes as `shared_assets::auth::session::build_set_cookie_header`.
+//!   attributes as `shared_backend::auth::session::build_set_cookie_header`.
 
-use shared::TodoLists;
+use shared_core::types::TodoLists;
 use std::fs::File;
 use std::io::Read;
 
@@ -82,7 +82,7 @@ pub fn generate_random_id() -> String {
 /// with existing installs; changing it would invalidate every existing
 /// session). Cookie **value** is a random session ID, never the PIN.
 ///
-/// Security attributes match `shared_assets::auth::session::build_set_cookie_header`:
+/// Security attributes match `shared_backend::auth::session::build_set_cookie_header`:
 ///
 /// - `HttpOnly` — not readable from JavaScript
 /// - `SameSite=Strict` — not sent on cross-site navigations

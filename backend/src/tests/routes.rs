@@ -7,7 +7,7 @@ use axum::{
     http::{HeaderMap, StatusCode},
 };
 use axum_extra::extract::cookie::CookieJar;
-use shared::{PinRequiredResponse, SiteConfig, VerifyPinRequest};
+use shared_core::types::{PinRequiredResponse, SiteConfig, VerifyPinRequest};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -118,7 +118,7 @@ async fn verify_pin_short_returns_400_without_incrementing() {
     let res = routes::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-    let left = shared_assets::auth::attempts_left(
+    let left = shared_backend::auth::attempts_left(
         "10.0.0.3",
         state.max_attempts as u32,
         state.lockout_duration,

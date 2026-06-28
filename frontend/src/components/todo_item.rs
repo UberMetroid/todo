@@ -1,4 +1,4 @@
-use shared::TodoItem as SharedTodoItem;
+use shared_core::types::TodoItem as SharedTodoItem;
 use web_sys::{DragEvent, HtmlInputElement, MouseEvent};
 use yew::prelude::*;
 

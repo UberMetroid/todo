@@ -1,4 +1,4 @@
-//! Axum middleware: thin wrappers over `shared_assets::middleware`.
+//! Axum middleware: thin wrappers over `shared_backend::middleware`.
 //!
 //! Every layer here is either a one-line re-export or a thin glue layer
 //! that adapts to todo's per-route state. All actual security policy
@@ -143,10 +143,10 @@ fn extract_origin(url: &str) -> &str {
 // they are installed in `main.rs` via `from_fn_with_state` directly —
 // not wrapped here.
 
-/// Re-export `shared_assets::middleware::security_headers_layer` for use
+/// Re-export `shared_backend::middleware::security_headers_layer` for use
 /// with `axum::middleware::from_fn(security_headers_middleware)`.
 pub async fn security_headers_middleware(request: Request, next: Next) -> Response {
-    shared_assets::middleware::security_headers_layer(request, next).await
+    shared_backend::middleware::security_headers_layer(request, next).await
 }
 
 #[cfg(test)]

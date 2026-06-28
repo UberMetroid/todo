@@ -7,7 +7,7 @@ fn todo_state_envelope_roundtrip() {
     let mut lists = HashMap::new();
     lists.insert(
         "inbox".into(),
-        vec![shared::TodoItem {
+        vec![shared_core::types::TodoItem {
             id: "abc123".into(),
             text: "buy milk".into(),
             completed: false,

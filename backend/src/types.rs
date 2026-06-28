@@ -1,18 +1,19 @@
-//! Backend-only types that don't belong in the `shared` crate.
+//! Backend-only types that don't belong in the `shared_core` crate.
 //!
 //! Currently this is just [`TodoState`], the envelope around
-//! [`shared::TodoLists`] that adds an optimistic-concurrency version
-//! field. The on-disk shape of `data/todos.json` is now this envelope
-//! instead of the raw list map.
+//! [`shared_core::types::TodoLists`] that adds an
+//! optimistic-concurrency version field. The on-disk shape of
+//! `data/todos.json` is now this envelope instead of the raw list map.
 //!
-//! Auth/config wire types ([`shared::PinRequiredResponse`],
-//! [`shared::SiteConfig`], [`shared::VerifyPinRequest`],
-//! [`shared::VerifyPinResponse`]) live in the `shared` crate because
-//! the frontend also consumes them.
+//! Auth/config wire types ([`shared_core::types::PinRequiredResponse`],
+//! [`shared_core::types::SiteConfig`],
+//! [`shared_core::types::VerifyPinRequest`],
+//! [`shared_core::types::VerifyPinResponse`]) live in the
+//! `shared_core` crate because the frontend also consumes them.
 
 use serde::{Deserialize, Serialize};
 
-/// On-disk envelope around [`shared::TodoLists`].
+/// On-disk envelope around [`shared_core::types::TodoLists`].
 ///
 /// Wrapping the data adds optimistic-concurrency control: every save
 /// must include the version it observed, and the server rejects with
@@ -29,7 +30,7 @@ pub struct TodoState {
     #[serde(default)]
     pub version: u64,
     /// The actual list data.
-    pub lists: shared::TodoLists,
+    pub lists: shared_core::types::TodoLists,
 }
 
 impl TodoState {
@@ -46,7 +47,7 @@ impl TodoState {
             return Ok((state, false));
         }
         // Fall back to the legacy raw map and migrate.
-        let lists: shared::TodoLists = serde_json::from_str(content)?;
+        let lists: shared_core::types::TodoLists = serde_json::from_str(content)?;
         Ok((Self { version: 1, lists }, true))
     }
 }
@@ -58,10 +59,10 @@ mod tests {
 
     #[test]
     fn envelope_roundtrip() {
-        let mut lists: shared::TodoLists = HashMap::new();
+        let mut lists: shared_core::types::TodoLists = HashMap::new();
         lists.insert(
             "inbox".into(),
-            vec![shared::TodoItem {
+            vec![shared_core::types::TodoItem {
                 id: "abc".into(),
                 text: "x".into(),
                 completed: false,

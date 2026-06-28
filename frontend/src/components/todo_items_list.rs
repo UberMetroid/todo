@@ -1,5 +1,5 @@
 use crate::components::todo_item::TodoItemComponent;
-use shared::TodoItem;
+use shared_core::types::TodoItem;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]

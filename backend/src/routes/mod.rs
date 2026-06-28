@@ -19,7 +19,7 @@ mod tests {
         http::{HeaderMap, StatusCode},
     };
     use axum_extra::extract::cookie::CookieJar;
-    use shared::VerifyPinRequest;
+    use shared_core::types::VerifyPinRequest;
     use std::collections::HashMap;
     use std::net::SocketAddr;
     use std::sync::Arc;
@@ -96,7 +96,7 @@ mod tests {
 
         // Counter should still be 0 for this IP — no failed attempts
         // recorded for a format error.
-        let left = shared_assets::auth::attempts_left(
+        let left = shared_backend::auth::attempts_left(
             "10.0.0.99",
             state.max_attempts as u32,
             state.lockout_duration,
@@ -113,7 +113,7 @@ mod tests {
         let req = VerifyPinRequest { pin: "5678".into() };
         let res = verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
         assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
-        let left = shared_assets::auth::attempts_left(
+        let left = shared_backend::auth::attempts_left(
             "10.0.0.100",
             state.max_attempts as u32,
             state.lockout_duration,
@@ -146,7 +146,7 @@ mod tests {
             Json(VerifyPinRequest { pin: "1234".into() }),
         )
         .await;
-        let left = shared_assets::auth::attempts_left(
+        let left = shared_backend::auth::attempts_left(
             "10.0.0.101",
             state.max_attempts as u32,
             state.lockout_duration,

@@ -1,5 +1,5 @@
 use crate::i18n::{TransKey, use_i18n};
-use shared::PinRequiredResponse;
+use shared_core::types::PinRequiredResponse;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]

@@ -1,5 +1,7 @@
 use gloo_net::http::{Request, Response};
-use shared::{PinRequiredResponse, SiteConfig, TodoLists, VerifyPinRequest, VerifyPinResponse};
+use shared_core::types::{
+    PinRequiredResponse, SiteConfig, TodoLists, VerifyPinRequest, VerifyPinResponse,
+};
 
 // Fetches the site configuration properties from the server
 pub async fn fetch_config() -> Result<SiteConfig, gloo_net::Error> {

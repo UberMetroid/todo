@@ -4,7 +4,7 @@ use crate::components::todo_items_list::TodoItemsList;
 use crate::components::todo_list_handlers;
 use crate::i18n::{TransKey, use_i18n};
 use crate::types::ToastType;
-use shared::{SiteConfig, TodoLists};
+use shared_core::types::{SiteConfig, TodoLists};
 use web_sys::MouseEvent;
 use yew::prelude::*;
 

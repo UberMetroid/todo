@@ -2,10 +2,10 @@ use crate::api;
 use crate::app::{App, Msg};
 use crate::storage::StorageService;
 use crate::types::ToastType;
-use shared::PinRequiredResponse;
+use shared_core::types::PinRequiredResponse;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-use shared_assets::theme::{Theme, mapping::Scheme};
+use shared_frontend::theme::{Theme, mapping::Scheme};
 
 impl App {
     pub fn create_app(ctx: &Context<Self>) -> Self {

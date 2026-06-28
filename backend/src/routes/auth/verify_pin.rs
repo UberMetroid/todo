@@ -11,7 +11,7 @@ use std::time::Duration;
 use super::super::{PIN_MAX_LEN, PIN_MIN_LEN};
 use crate::auth::{build_session_cookie_header, secure_compare};
 use crate::state::{SharedState, get_client_ip};
-use shared::{VerifyPinRequest, VerifyPinResponse};
+use shared_core::types::{VerifyPinRequest, VerifyPinResponse};
 
 pub async fn verify_pin(
     State(state): State<SharedState>,
@@ -45,9 +45,9 @@ pub async fn verify_pin(
     };
 
     // 1. Lockout check — return 429 without inspecting the PIN.
-    if shared_assets::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration) {
+    if shared_backend::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration) {
         let remaining =
-            shared_assets::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
+            shared_backend::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
         let minutes = remaining.div_ceil(60);
         return (
             StatusCode::TOO_MANY_REQUESTS,
@@ -100,7 +100,7 @@ pub async fn verify_pin(
 
     if valid {
         // Success — clear lockout counter, issue session cookie.
-        shared_assets::auth::reset_attempts(&client_ip);
+        shared_backend::auth::reset_attempts(&client_ip);
 
         let session_id = crate::auth::generate_session_id();
         state
@@ -145,7 +145,7 @@ pub async fn verify_pin(
         // Failed comparison — increment counter. If this is the attempt
         // that crosses `max_attempts`, the next call will see the
         // lockout.
-        let attempt = shared_assets::auth::record_attempt(&client_ip);
+        let attempt = shared_backend::auth::record_attempt(&client_ip);
         let left = max_attempts.saturating_sub(attempt.count) as usize;
 
         (

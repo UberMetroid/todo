@@ -1,8 +1,8 @@
 //! `todo` backend entrypoint.
 //!
-//! Configuration is parsed by `shared_assets::server::ServerConfig`,
-//! CORS is `shared_assets::middleware::cors_layer`, and security
-//! headers + HSTS + title injection come from `shared_assets::middleware`.
+//! Configuration is parsed by `shared_backend::server::ServerConfig`,
+//! CORS is `shared_backend::middleware::cors_layer`, and security
+//! headers + HSTS + title injection come from `shared_backend::middleware`.
 //! The remaining middlewares (`auth_middleware`, `rate_limit_middleware`,
 //! `origin_validation_middleware`) are todo-specific and live in
 //! `middleware.rs`.
@@ -22,18 +22,18 @@ mod state;
 mod tests;
 mod types;
 
-pub use middleware::{auth, custom, static_files};
 use middleware::auth::run_todo_migrations;
 use middleware::custom::{
     auth_middleware, origin_validation_middleware, rate_limit_middleware,
     security_headers_middleware,
 };
-use routes::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
-use state::AppState;
 use middleware::static_files::{
     build_asset_manifest, serve_asset_manifest, serve_favicon, serve_favicon_png, serve_health,
     serve_index, serve_manifest, serve_service_worker,
 };
+pub use middleware::{auth, custom, static_files};
+use routes::{get_config, get_pin_required, get_todos, logout, save_todos, verify_pin};
+use state::AppState;
 use tracing_subscriber::{Layer, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
@@ -94,7 +94,7 @@ async fn main() {
         .init();
 
     // ───── config ─────
-    let server_config = Arc::new(shared_assets::server::ServerConfig::from_env("TODO"));
+    let server_config = Arc::new(shared_backend::server::ServerConfig::from_env("TODO"));
 
     let port = server_config.port;
     let allowed_origins = server_config.allowed_origins.clone();
@@ -143,7 +143,7 @@ async fn main() {
 
     // ───── background cleanup ─────
     // PIN-attempt entries are now stored process-globally by
-    // shared_assets::auth::attempts and are cleaned up lazily on read
+    // shared_backend::auth::attempts and are cleaned up lazily on read
     // (entries older than lockout_duration are dropped). We only need
     // to clean up the per-IP rate-limit map here.
     let clean_state = app_state.clone();
@@ -155,9 +155,9 @@ async fn main() {
     });
 
     // ───── middleware layers ─────
-    let cors = shared_assets::middleware::cors_layer(&server_config);
-    let hsts_state = shared_assets::middleware::HstsState(server_config.clone());
-    let title_state = shared_assets::middleware::TitleState(server_config.clone());
+    let cors = shared_backend::middleware::cors_layer(&server_config);
+    let hsts_state = shared_backend::middleware::HstsState(server_config.clone());
+    let title_state = shared_backend::middleware::TitleState(server_config.clone());
 
     let protected_routes = Router::new()
         .route("/todos", get(get_todos).post(save_todos))
@@ -200,12 +200,12 @@ async fn main() {
         // HSTS only when HTTPS is in use
         .layer(axum_middleware::from_fn_with_state(
             hsts_state,
-            shared_assets::middleware::hsts_layer,
+            shared_backend::middleware::hsts_layer,
         ))
         // title injection (replaces {{SITE_TITLE}} in HTML)
         .layer(axum_middleware::from_fn_with_state(
             title_state,
-            shared_assets::middleware::title_injection_layer,
+            shared_backend::middleware::title_injection_layer,
         ))
         // CORS last so it can short-circuit OPTIONS preflights
         .layer(cors)

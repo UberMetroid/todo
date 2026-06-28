@@ -6,7 +6,7 @@ use yew::prelude::*;
 
 use crate::api;
 use crate::types::ToastType;
-use shared::{PinRequiredResponse, SiteConfig, TodoLists};
+use shared_core::types::{PinRequiredResponse, SiteConfig, TodoLists};
 
 #[function_component(App)]
 pub fn app() -> Html {

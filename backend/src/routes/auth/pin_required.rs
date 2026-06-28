@@ -5,9 +5,9 @@ use axum::{
 };
 use std::net::SocketAddr;
 
-use super::super::{PIN_MIN_LEN};
+use super::super::PIN_MIN_LEN;
 use crate::state::{SharedState, get_client_ip};
-use shared::PinRequiredResponse;
+use shared_core::types::PinRequiredResponse;
 
 pub async fn get_pin_required(
     State(state): State<SharedState>,
@@ -23,11 +23,11 @@ pub async fn get_pin_required(
     let max_attempts = state.max_attempts as u32;
 
     let locked =
-        shared_assets::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration);
+        shared_backend::auth::is_locked_out(&client_ip, max_attempts, state.lockout_duration);
     let remaining_secs =
-        shared_assets::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
+        shared_backend::auth::lockout_remaining_secs(&client_ip, state.lockout_duration);
     let attempts_left =
-        shared_assets::auth::attempts_left(&client_ip, max_attempts, state.lockout_duration)
+        shared_backend::auth::attempts_left(&client_ip, max_attempts, state.lockout_duration)
             as usize;
 
     let lockout_minutes = if locked {

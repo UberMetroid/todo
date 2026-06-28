@@ -1,6 +1,6 @@
 use crate::state::SharedState;
 use axum::{Json, extract::State};
-use shared::SiteConfig;
+use shared_core::types::SiteConfig;
 
 pub async fn get_config(State(state): State<SharedState>) -> Json<SiteConfig> {
     Json(SiteConfig {

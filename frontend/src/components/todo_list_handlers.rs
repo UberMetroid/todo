@@ -1,6 +1,6 @@
 use crate::i18n::{Locale, TransKey, translate};
 use crate::types::ToastType;
-use shared::{TodoItem, TodoLists};
+use shared_core::types::{TodoItem, TodoLists};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlFormElement, HtmlInputElement, MouseEvent};
 use yew::prelude::*;

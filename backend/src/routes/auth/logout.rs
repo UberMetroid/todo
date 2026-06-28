@@ -1,10 +1,6 @@
-use axum::{
-    extract::State,
-    http::StatusCode,
-    response::IntoResponse,
-};
-use axum_extra::extract::cookie::{Cookie, CookieJar};
 use crate::state::SharedState;
+use axum::{extract::State, http::StatusCode, response::IntoResponse};
+use axum_extra::extract::cookie::{Cookie, CookieJar};
 
 pub async fn logout(cookie_jar: CookieJar, State(state): State<SharedState>) -> impl IntoResponse {
     if let Some(cookie) = cookie_jar.get("TODO_PIN") {

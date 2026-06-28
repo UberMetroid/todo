@@ -2,8 +2,8 @@ use crate::components::header::Header;
 use crate::components::pin::Login;
 use crate::components::todo_list::TodoList;
 use crate::types::ToastType;
-use shared::{PinRequiredResponse, SiteConfig, TodoLists};
-use shared_assets::i18n::Language;
+use shared_core::i18n::Language;
+use shared_core::types::{PinRequiredResponse, SiteConfig, TodoLists};
 use yew::prelude::*;
 
 #[allow(clippy::too_many_arguments)]
@@ -81,10 +81,10 @@ pub fn render_app(
                 is_authenticated={*authenticated}
                 pin_required={is_pin_required}
                 on_logout={on_logout}
-                disable_print={disable_print}
+                print_disabled={disable_print}
                 enable_translation={enable_translation}
                 enable_themes={site_config_fallback.enable_themes}
-                enable_print={site_config_fallback.enable_print}
+                on_print={None}
             />
             <div class="container">
                 if is_auth {
