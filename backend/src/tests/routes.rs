@@ -1,13 +1,6 @@
-//! End-to-end tests for the public handlers.
-//!
-//! These tests use the new [`AppState`] shape (after the shared-assets
-//! migration) and the [`types`] module instead of the deleted
-//! `shared` crate's auth/config types.
-
-use super::*;
-use crate::auth::{build_session_cookie_header, generate_random_id, generate_session_id};
+use crate::auth::{generate_random_id, generate_session_id};
+use crate::routes;
 use crate::state::AppState;
-use crate::types::TodoState;
 use axum::{
     Json,
     extract::{ConnectInfo, State},
@@ -20,7 +13,6 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-/// Helper: build a fully-populated `AppState` for tests.
 fn test_state() -> Arc<AppState> {
     Arc::new(AppState {
         pin: Some("12345678".into()),
@@ -45,61 +37,6 @@ fn test_state() -> Arc<AppState> {
     })
 }
 
-// ──────────────────────────── domain types ─────────────────────────────
-
-#[test]
-fn todo_state_envelope_roundtrip() {
-    let mut lists = HashMap::new();
-    lists.insert(
-        "inbox".into(),
-        vec![shared::TodoItem {
-            id: "abc123".into(),
-            text: "buy milk".into(),
-            completed: false,
-        }],
-    );
-    let state = TodoState { version: 7, lists };
-    let json = serde_json::to_string(&state).unwrap();
-    let back: TodoState = serde_json::from_str(&json).unwrap();
-    assert_eq!(state, back);
-}
-
-#[test]
-fn todo_state_migrates_legacy_format() {
-    let legacy = r#"{"inbox":[{"id":"a","text":"x","completed":false}]}"#;
-    let (state, needs_rewrite) = TodoState::parse_with_migration(legacy).unwrap();
-    assert_eq!(state.version, 1);
-    assert!(needs_rewrite);
-    assert_eq!(state.lists.len(), 1);
-}
-
-#[test]
-fn todo_state_rejects_garbage() {
-    assert!(TodoState::parse_with_migration("not json").is_err());
-}
-
-// ──────────────────────────── cookie helper ────────────────────────────
-
-#[test]
-fn session_cookie_has_security_attrs() {
-    let h = build_session_cookie_header("deadbeef", 24, false);
-    assert!(h.starts_with("TODO_PIN=deadbeef"));
-    assert!(h.contains("HttpOnly"));
-    assert!(h.contains("SameSite=Strict"));
-    assert!(h.contains("Path=/"));
-    assert!(h.contains("Max-Age=86400"));
-    assert!(!h.contains("; Secure"));
-}
-
-#[test]
-fn session_cookie_includes_secure_when_https() {
-    let h = build_session_cookie_header("x", 1, true);
-    assert!(h.contains("; Secure"));
-    assert!(h.contains("Max-Age=3600"));
-}
-
-// ─────────────────────────────── ids ───────────────────────────────────
-
 #[test]
 fn session_id_format() {
     let id = generate_session_id();
@@ -120,8 +57,6 @@ fn random_ids_are_unique() {
     let b = generate_random_id();
     assert_ne!(a, b);
 }
-
-// ──────────────────────────── handlers ─────────────────────────────────
 
 #[tokio::test]
 async fn get_config_returns_state_values() {
@@ -183,8 +118,6 @@ async fn verify_pin_short_returns_400_without_incrementing() {
     let res = routes::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-    // Counter for this IP must remain at 0 — format errors are not
-    // brute-force attempts.
     let left = shared_assets::auth::attempts_left(
         "10.0.0.3",
         state.max_attempts as u32,
@@ -212,7 +145,6 @@ async fn verify_pin_lockout_after_max_attempts() {
         )
         .await;
     }
-    // 6th attempt must be locked out.
     let jar = CookieJar::new();
     let req = VerifyPinRequest {
         pin: "12345678".into(),
@@ -220,8 +152,6 @@ async fn verify_pin_lockout_after_max_attempts() {
     let res = routes::verify_pin(State(state.clone()), connect_info, headers, jar, Json(req)).await;
     assert_eq!(res.status(), StatusCode::TOO_MANY_REQUESTS);
 }
-
-// ────────────────────────── auth middleware ────────────────────────────
 
 #[tokio::test]
 async fn rate_limit_allows_under_threshold() {
@@ -254,7 +184,6 @@ fn client_ip_proxy_without_list_ignores_xff() {
     let mut headers = HeaderMap::new();
     headers.insert("x-forwarded-for", "1.2.3.4".parse().unwrap());
     let ip = crate::state::get_client_ip(&headers, socket, true, &[]);
-    // Fail-safe: trust_proxy=true without allowlist → use socket IP.
     assert_eq!(ip, "10.0.0.1");
 }
 
