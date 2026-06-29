@@ -60,7 +60,10 @@ pub fn render_app(
         .map(|t| t.values().all(|v| v.is_empty()))
         .unwrap_or(true);
 
-    let enable_print = pin_required.as_ref().map(|p| p.enable_print).unwrap_or(false);
+    let enable_print = pin_required
+        .as_ref()
+        .map(|p| p.enable_print)
+        .unwrap_or(false);
     let enable_translation = pin_required
         .as_ref()
         .map(|p| p.enable_translation)
