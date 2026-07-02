@@ -211,7 +211,7 @@ pub fn app() -> Html {
         authenticated,
         todos,
         current_list,
-        (*active_notification).clone(),
+        active_notification.clone(),
         (*pin_error).clone(),
         Callback::from(verify_submit_pin),
         on_logout,

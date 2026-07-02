@@ -16,7 +16,7 @@ pub fn render_app(
     authenticated: UseStateHandle<bool>,
     todos: UseStateHandle<Option<TodoLists>>,
     current_list: UseStateHandle<String>,
-    active_notification: Option<(String, String)>,
+    active_notification: UseStateHandle<Option<(String, String)>>,
     pin_error: Option<String>,
     verify_submit_pin: Callback<String>,
     on_logout: Callback<web_sys::MouseEvent>,
@@ -113,7 +113,7 @@ pub fn render_app(
             </div>
             <crate::components::footer::Footer version={version.clone()} show_github={show_github}>
                 {
-                    if let Some((msg, cls)) = &active_notification {
+                    if let Some((msg, cls)) = &*active_notification {
                         html! { <div class={format!("footer-status-text {}", cls)}>{ msg }</div> }
                     } else {
                         html! { <div class="footer-status-text success">{"Ready"}</div> }
